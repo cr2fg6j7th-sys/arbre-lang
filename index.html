@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Arbre généalogique familial LANG–STEFFAN, fait par fait et acte par acte.">
+<script>
+window.addEventListener("error", function(e){
+  var t = document.getElementById("stage") || document.body;
+  var d = document.createElement("div");
+  d.style.cssText = "position:relative;padding:16px;font:14px sans-serif;color:#b2452b;background:#fff";
+  d.textContent = "Erreur d'affichage : " + (e.message || e) + " (ligne " + (e.lineno || "?") + "). Envoyez une capture de ce message.";
+  t.appendChild(d);
+});
+</script>
+<title>Arbre LANG–STEFFAN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a drawn pedigree — ancestors at the crown, Nathan at the root; couples joined by marriage bars, lines dropping to each child */
+:root{
+  --paper:#faf6ec; --sheet:#ffffff; --ink:#1d2a2b; --ink-soft:#5a5f58; --rule:#e5dccb; --line:#a7a28f;
+  --accent:#2f5d62; --canvas:#fdfbf5; color-scheme:light;
+  --proved:#2e7d4f; --proved-bg:#e4f2e8;
+  --mention:#2f5d62; --mention-bg:#e2eef0;
+  --family:#8a6a1f; --family-bg:#f6eedb;
+  --check:#b2452b; --check-bg:#f8e4de;
+  --b-lang:#3a5a8c; --b-naas:#6b4f8f; --b-steffan:#2f7a6a; --b-margani:#a8552f;
+  --f-display:"Libre Caslon Text", Georgia, "Times New Roman", serif;
+  --f-body:"Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root.sans-mode-sombre{
+  --paper:#131a1b; --sheet:#1d2728; --ink:#e7ece9; --ink-soft:#9fb0ab; --rule:#2c3a3b; --line:#5e716d;
+  --accent:#8cc2c8; --canvas:#172021;
+  --proved:#7fd1a0; --proved-bg:#1d3527; --mention:#8cc2c8; --mention-bg:#1c3135;
+  --family:#e0bd6a; --family-bg:#352c17; --check:#f0937a; --check-bg:#3a201a;
+  --b-lang:#86a6dc; --b-naas:#b49ad8; --b-steffan:#76c7b4; --b-margani:#e79a72;
+  color-scheme:dark;}}
+:root.sans-mode-sombre{
+  --paper:#131a1b; --sheet:#1d2728; --ink:#e7ece9; --ink-soft:#9fb0ab; --rule:#2c3a3b; --line:#5e716d;
+  --accent:#8cc2c8; --canvas:#172021;
+  --proved:#7fd1a0; --proved-bg:#1d3527; --mention:#8cc2c8; --mention-bg:#1c3135;
+  --family:#e0bd6a; --family-bg:#352c17; --check:#f0937a; --check-bg:#3a201a;
+  --b-lang:#86a6dc; --b-naas:#b49ad8; --b-steffan:#76c7b4; --b-margani:#e79a72;
+  color-scheme:dark;}
+
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-block:28px 56px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:flex;flex-direction:column;gap:24px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--f-data);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,5vw,42px);line-height:1.1;margin:0;text-wrap:balance}
+h1 em{font-style:italic;font-weight:400;color:var(--accent)}
+.lede{margin:0;color:var(--ink-soft);max-width:62ch}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.stat{background:var(--sheet);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--f-data);font-weight:500;font-size:22px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12.5px;color:var(--ink-soft)}
+@media (max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--ink-soft)}
+.legend .grp{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+.pill{font-family:var(--f-data);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:3px;white-space:nowrap;font-weight:500}
+.s-proved{color:var(--proved);background:var(--proved-bg)}
+.s-mention{color:var(--mention);background:var(--mention-bg)}
+.s-family{color:var(--family);background:var(--family-bg)}
+.s-check{color:var(--check);background:var(--check-bg)}
+
+/* --- the tree canvas --- */
+.board{border:1px solid var(--rule);border-radius:10px;background:var(--canvas);display:flex;flex-direction:column;overflow:hidden;
+  width:min(1640px, calc(100vw - 24px));align-self:center}
+.board.full{position:fixed;inset:0;width:auto;z-index:50;border-radius:0;border:none}
+body.noscroll{overflow:hidden}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--rule);background:var(--sheet);flex-wrap:wrap}
+.toolbar .hint{font-size:12.5px;color:var(--ink-soft)}
+.zoom{display:flex;gap:4px}
+.zbtn{all:unset;cursor:pointer;font-family:var(--f-data);font-size:13px;min-width:30px;text-align:center;padding:4px 8px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.zbtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.scroller{overflow:auto;-webkit-overflow-scrolling:touch;height:max(520px, calc(100vh - 150px));height:max(520px, calc(100svh - 150px));cursor:grab;touch-action:pan-x pan-y;overscroll-behavior:contain}
+.board.full .scroller{height:auto;flex:1}
+.toolbar .jump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1}
+.toolbar .jump::-webkit-scrollbar{display:none}
+.jbtn{white-space:nowrap;flex:none}
+.zoom{flex:none}
+.tip{font-size:12px;color:var(--ink-soft);padding:6px 12px;border-top:1px solid var(--rule);background:var(--sheet)}
+@media (max-width:640px){
+  .wrap{padding-block:18px 40px;gap:18px}
+  h1{font-size:30px !important}
+  .toolbar{flex-wrap:nowrap;padding:6px}
+  .zbtn{min-width:34px;padding:7px 8px;font-size:14px}
+  #zfit{display:none}
+  .scroller{height:calc(100vh - 120px);height:calc(100svh - 120px);min-height:440px}
+  dialog{max-width:100vw;margin:auto 0 0 0;width:100vw}
+  .sheet{border-radius:14px 14px 0 0;max-height:88vh;max-height:88svh;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+  .fact{grid-template-columns:78px minmax(0,1fr)}
+  .checks li{font-size:12.5px}
+}
+.scroller.drag{cursor:grabbing;user-select:none}
+.sizer{position:relative}
+.stage{position:absolute;left:0;top:0;transform-origin:0 0}
+.stage svg{position:absolute;left:0;top:0;overflow:visible}
+.stage .wire{fill:none;stroke:var(--line);stroke-width:1.6}
+.stage .wed{fill:none;stroke:var(--accent);stroke-width:2}
+.stage .ring{fill:var(--canvas);stroke:var(--accent);stroke-width:1.6}
+.stage .rowlab{font-family:var(--f-display);font-size:22px;fill:var(--accent)}
+.stage .rowsub{font-family:var(--f-body);font-size:12px;fill:var(--ink-soft)}
+.stage .side{fill:none;stroke:var(--c);stroke-width:1.5;stroke-dasharray:2 5;opacity:.75}
+.stage .sidelab{font-family:var(--f-data);font-size:15px;letter-spacing:.14em;fill:var(--ink)}
+.stage .sidesub{font-family:var(--f-body);font-size:13px;fill:var(--ink-soft)}
+.stage .zone{fill:var(--c);fill-opacity:.09;stroke:var(--c);stroke-opacity:.45;stroke-width:1.2}
+.stage .zonelab{font-family:var(--f-display);font-size:15px;font-weight:700}
+.stage .subzone{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:4 4}
+.stage .sublab{font-family:var(--f-body);font-size:12px;font-style:italic;fill:var(--ink-soft)}
+.jump{display:flex;gap:4px;flex-wrap:wrap}
+.jbtn{all:unset;cursor:pointer;font-size:12.5px;padding:4px 9px;border-radius:999px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.jbtn i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.jbtn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.stage .stub{fill:none;stroke:var(--line);stroke-width:1.2;stroke-dasharray:3 4}
+.stage .stubtxt{font-family:var(--f-data);font-size:10.5px;fill:var(--ink-soft)}
+
+.node{all:unset;box-sizing:border-box;position:absolute;cursor:pointer;background:var(--sheet);border:1px solid var(--rule);
+  border-top:4px solid var(--branch,var(--accent));border-radius:6px;padding:7px 9px 8px;display:flex;flex-direction:column;gap:2px;
+  box-shadow:0 1px 0 rgba(0,0,0,.04);transition:border-color .15s, box-shadow .15s}
+.node:hover{border-color:var(--ink-soft);border-top-color:var(--branch,var(--accent));box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.node:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.node.me{border-width:2px;border-top-width:5px;border-color:var(--accent)}
+.node .top{display:flex;justify-content:space-between;align-items:center;gap:4px}
+.sosa{font-family:var(--f-data);font-size:10.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.sdot{width:9px;height:9px;border-radius:50%;flex:none}
+.sdot.proved{background:var(--proved)}.sdot.mention{background:var(--mention)}.sdot.family{background:var(--family)}.sdot.check{background:var(--check)}
+.node .given{font-family:var(--f-display);font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node .surname{font-weight:600;font-size:12px;letter-spacing:.07em;text-transform:uppercase;line-height:1.2}
+.node .yrs{font-family:var(--f-data);font-size:11px;color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.side{display:flex;flex-direction:column;gap:10px}
+h2{font-family:var(--f-display);font-weight:400;font-size:22px;margin:0;text-wrap:balance}
+.kin{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr))}
+.kin .node{position:relative}
+
+.cols{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px}
+@media (max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:14px}
+.list .meta{grid-column:1/-1;font-size:12.5px;color:var(--ink-soft)}
+.list .where{font-family:var(--f-data);font-size:11.5px;color:var(--ink-soft)}
+footer{font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:14px}
+
+dialog{border:none;padding:0;background:transparent;max-width:min(560px,calc(100vw - 24px));width:100%;color:var(--ink)}
+dialog::backdrop{background:rgba(10,16,17,.45)}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:14px;max-height:85vh;overflow:auto}
+.sheet .hd{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.sheet h3{font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1.15;margin:0}
+.sheet h3 small{display:block;font-family:var(--f-data);font-size:11px;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
+.close{all:unset;cursor:pointer;font-family:var(--f-data);font-size:12px;padding:6px 10px;border:1px solid var(--rule);border-radius:4px;color:var(--ink-soft)}
+.close:focus-visible{outline:2px solid var(--accent)}
+.facts{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.fact{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 12px;padding:9px 0;border-bottom:1px solid var(--rule)}
+.fact .k{font-family:var(--f-data);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);padding-top:2px}
+.fact .v{display:flex;flex-direction:column;gap:3px;font-size:14px}
+.fact .src{font-size:12px;color:var(--ink-soft);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.links{display:flex;flex-wrap:wrap;gap:6px}
+.chip{all:unset;cursor:pointer;font-size:12.5px;padding:3px 8px;border:1px solid var(--rule);border-radius:3px}
+.chip:focus-visible{outline:2px solid var(--accent)}
+.acts{display:flex;flex-direction:column;gap:6px}
+.act{border:1px solid var(--rule);border-radius:6px;background:var(--sheet)}
+.act summary{position:relative;padding-right:26px !important;cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:8px 10px}
+.act summary::-webkit-details-marker{display:none}
+.act summary::after{content:"▸";position:absolute;right:10px;top:9px;color:var(--ink-soft)}
+.act[open] summary::after{content:"▾"}
+.act .at{font-weight:600;font-size:13.5px}.act .ac{font-size:12.5px;color:var(--ink-soft)}
+.act .ar{font-family:var(--f-data);font-size:11px;color:var(--ink-soft);width:100%}
+.act .ab{padding:0 10px 10px;font-size:13px;display:flex;flex-direction:column;gap:8px}
+.act .ab p{margin:0}.act .aref{font-size:12px;color:var(--ink-soft)}.act .aref a{color:var(--accent)}
+.act.attendu{border-style:dashed}
+.chip em{font-style:normal;color:var(--ink-soft);font-size:11px}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.checks li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;font-size:13px;padding:8px 10px;border-radius:6px;background:var(--proved-bg)}
+.checks li.warn{background:var(--check-bg)}
+.checks li b{color:var(--proved)}.checks li.warn b{color:var(--check)}
+.audit{display:flex;flex-direction:column;gap:14px}
+.audit .sum{display:flex;gap:10px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-soft)}
+.audit .sum b{color:var(--ink)}
+.note{font-size:13px;background:var(--paper);border-radius:4px;padding:10px 12px;color:var(--ink-soft)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Généalogie de Nathan LANG · Haut-Rhin, Allschwil, Balsorano</div>
+    <h1>Arbre <em>LANG–STEFFAN</em></h1>
+    <p class="lede">Chaque fait porte sa preuve : acte d'état civil, simple mention dans un autre acte, ou récit familial en attente de vérification. Touchez une personne pour voir ses sources.</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="legend">
+    <div class="grp">
+      <span><i class="sdot proved" style="display:inline-block;margin-right:5px"></i>Acte</span>
+      <span><i class="sdot mention" style="display:inline-block;margin-right:5px"></i>Mention dans un autre acte</span>
+      <span><i class="sdot family" style="display:inline-block;margin-right:5px"></i>Récit familial</span>
+      <span><i class="sdot check" style="display:inline-block;margin-right:5px"></i>À vérifier</span>
+    </div>
+    <div class="grp">
+      <span><i class="dot" style="background:var(--b-lang)"></i>LANG</span>
+      <span><i class="dot" style="background:var(--b-naas)"></i>NAAS</span>
+      <span><i class="dot" style="background:var(--b-steffan)"></i>STEFFAN</span>
+      <span><i class="dot" style="background:var(--b-margani)"></i>MARGANI</span>
+    </div>
+  </div>
+
+  <section class="board" aria-label="Arbre généalogique">
+    <div class="toolbar">
+      <div class="jump" id="jump" aria-label="Aller à une branche"></div>
+      <div class="zoom">
+        <button class="zbtn" id="zout" aria-label="Dézoomer">−</button>
+        <button class="zbtn" id="zfit">Ajuster</button>
+        <button class="zbtn" id="zin" aria-label="Zoomer">+</button>
+        <button class="zbtn" id="zfull" aria-label="Plein écran" title="Plein écran">⤢</button>
+      </div>
+    </div>
+    <div class="scroller" id="scroller"><div class="sizer" id="sizer"><div class="stage" id="stage"></div></div></div>
+    <div class="tip" id="tip">Glissez pour vous déplacer · pincez ou utilisez − / + pour zoomer · touchez une personne pour voir ses actes · ⤢ plein écran</div>
+  </section>
+
+  <section class="side">
+    <h2>Frères et sœurs de Céleste</h2>
+    <div class="kin" id="kin"></div>
+  </section>
+
+  <section class="side audit" aria-label="Vérification de la branche LANG">
+    <h2>Vérification de la branche LANG</h2>
+    <div class="sum" id="auditsum"></div>
+    <ul class="checks" id="auditlist"></ul>
+  </section>
+
+  <div class="cols">
+    <section class="side">
+      <h2>Demandes en cours</h2>
+      <ul class="list" id="pending"></ul>
+    </section>
+    <section class="side">
+      <h2>Corrections à faire sur Geneanet</h2>
+      <ul class="list" id="fixes"></ul>
+    </section>
+  </div>
+
+  <footer>Mis à jour le <span id="updated"></span>. Les adresses figurant dans les actes ne sont pas reprises ici. Les personnes vivantes sont masquées. Les images des actes ne sont pas reproduites (conditions des Archives d'Alsace) : seules les références sont données.</footer>
+</div>
+
+<dialog id="dlg"><div class="sheet" id="sheet"></div></dialog>
+
+<script>
+const UPDATED = "24 octobre 2026";
+const BR = {lang:"var(--b-lang)", naas:"var(--b-naas)", steffan:"var(--b-steffan)", margani:"var(--b-margani)"};
+const ST = {proved:["s-proved","Acte"], mention:["s-mention","Mention"], family:["s-family","Famille"], check:["s-check","À vérifier"]};
+
+/* ---------- Données (une entrée par personne) ---------- */
+const P = {"nathan": {"sosa": 1, "given": "Nathan", "surname": "LANG", "br": "lang", "parents": ["denis", "nadia"], "siblings": ["julie"], "facts": [], "rel": "Personne vivante", "note": "Personne vivante : dates, lieux et actes ne sont pas affichés sur la version en ligne."}, "julie": {"given": "Julie", "surname": "LANG", "br": "lang", "rel": "Sœur de Nathan", "parents": ["denis", "nadia"], "facts": [], "note": "Personne vivante : dates, lieux et actes ne sont pas affichés sur la version en ligne."}, "denis": {"sosa": 2, "given": "Denis", "surname": "LANG", "br": "lang", "parents": ["joseph", "aline"], "spouse": "nadia", "children": ["nathan", "julie"], "facts": [], "rel": "Personne vivante", "note": "Personne vivante : dates, lieux et actes ne sont pas affichés sur la version en ligne."}, "nadia": {"sosa": 3, "given": "Nadia", "surname": "STEFFAN", "br": "steffan", "parents": ["roger", "celeste"], "spouse": "denis", "children": ["nathan", "julie"], "facts": [], "rel": "Personne vivante", "note": "Personne vivante : dates, lieux et actes ne sont pas affichés sur la version en ligne."}, "joseph": {"sosa": 4, "given": "Joseph Aloyse", "surname": "LANG", "br": "lang", "birth": {"d": "18 mars 1927", "p": "Hagenthal-le-Haut", "s": "mention", "src": "Acte de décès, Saint-Louis n°85/2022"}, "death": {"d": "7 avr. 2022", "p": "Saint-Louis", "s": "proved", "src": "Acte de décès, Saint-Louis n°85/2022"}, "parents": ["simon", "josephine"], "spouse": "aline", "children": ["denis"], "facts": [["Métier", "Soudeur (retraité au décès)", "proved", "Acte de décès n°85/2022"], ["Mariage", "Avec Aline Germaine NAAS ; date et lieu inconnus", "family", "Acte à rechercher"]], "note": "Geneanet indique un décès le 7 avril 2023 : l'acte établit le 7 avril 2022. Acte de naissance demandé à Hagenthal-le-Haut."}, "aline": {"sosa": 5, "given": "Aline Germaine", "surname": "NAAS", "br": "naas", "birth": {"d": "30 oct. 1937", "p": "Allschwil (Suisse)", "s": "mention", "src": "Acte de décès, Saint-Louis n°160/2019"}, "death": {"d": "23 août 2019", "p": "Saint-Louis", "s": "proved", "src": "Acte de décès, Saint-Louis n°160/2019"}, "parents": ["albert", "marieanne"], "spouse": "joseph", "children": ["denis"], "facts": [["Statut", "Retraitée ; épouse de Joseph Aloyse LANG", "proved", "Acte de décès n°160/2019"]]}, "roger": {"sosa": 6, "given": "Roger François", "surname": "STEFFAN", "br": "steffan", "birth": {"d": "30 août 1938", "p": "Huningue", "s": "proved", "src": "Acte de naissance, Huningue n°52/1938"}, "death": {"d": "28 nov. 2021", "p": "Saint-Louis", "s": "proved", "src": "Acte de décès, Saint-Louis n°213/2021 ; mention marginale de l'acte de naissance"}, "parents": ["henri", "louise"], "spouse": "celeste", "children": ["nadia"], "facts": [["Métier", "Cadre (retraité au décès)", "proved", "Acte de décès n°213/2021"], ["Mariage", "Avec Céleste MARGANI, 21 juillet 1961, Huningue", "mention", "Mention marginale de l'acte de naissance n°52/1938 ; copie intégrale demandée à Huningue le 16/10/2026"]]}, "celeste": {"sosa": 7, "given": "Céleste", "surname": "MARGANI", "br": "margani", "parents": ["serafino", "santa"], "spouse": "roger", "children": ["nadia"], "siblings": ["aristide", "mariam", "liliane"], "facts": [], "rel": "Personne vivante", "note": "Personne vivante : dates, lieux et actes ne sont pas affichés sur la version en ligne."}, "simon": {"sosa": 8, "given": "Simon Émile", "surname": "LANG", "br": "lang", "children": ["joseph"], "spouse": "josephine", "parents": ["aloysel", "eugenie"], "birth": {"d": "27 oct. 1896", "p": "Hagenthal-le-Haut", "s": "proved", "src": "Acte de naissance n°5/1896, Hagenthal-le-Haut (Archives d'Alsace, 2MiEC458, vue 30), déclaré le 29/10/1896 par son père"}, "death": {"d": "21 juin 1978", "p": "Saint-Louis", "s": "mention", "src": "Mention marginale de l'acte de naissance ; fichier INSEE (acte de Saint-Louis n°140/1978, à 81 ans)"}, "facts": [["Parents", "Alois LANG, cultivateur (« Ackerer »), et Eugénie LANG née PFAU, catholiques, domiciliés à Hagenthal-le-Haut", "proved", "Acte de naissance n°5/1896"], ["Identité", "« Simon, Emile LANG » dans l'acte de décès de son fils ; « Simon Emil » dans son acte de naissance", "proved", "Actes n°5/1896 et n°85/2022"], ["Mariage", "Avec Joséphine Marie AMAN, Hagenthal-le-Bas, 9 mai 1921 (mention marginale relue le 24/10/2026)", "mention", "Mention marginale de l'acte de naissance de Joséphine ; acte demandé à Hagenthal-le-Bas"]], "variants": ["Simon Emil (acte de naissance, en allemand)", "Émile LANG (arbre Geneanet)", "Émile LANGE (ancienne indication, non confirmée)"], "note": "À ne pas confondre avec Joseph Aloise LANG (1911-1973) ni avec Émile Léon LANG (1926-2020), tous deux de Hagenthal-le-Haut."}, "josephine": {"sosa": 9, "given": "Joséphine Marie", "surname": "AMAN", "br": "lang", "parents": ["aloysea", "ursule"], "birth": {"d": "15 févr. 1896", "p": "Hagenthal-le-Bas", "s": "proved", "src": "Acte de naissance n°5/1896, Hagenthal-le-Bas (Archives d'Alsace, 2MiEC458, vue 51), déclaré le jour même par son père ; copie de la mairie en route"}, "death": {"d": "25 juil. 1982", "p": "Hagenthal-le-Haut", "s": "mention", "src": "Mention marginale de l'acte de naissance ; fichier INSEE (acte de Hagenthal-le-Haut n°3/1982, à 86 ans)"}, "children": ["joseph"], "spouse": "simon", "facts": [["Parents", "Alois AMAN, cultivateur, et Maria Ursula AMAN née SCHOEFFEL, catholiques, domiciliés à Hagenthal-le-Bas", "proved", "Acte de naissance n°5/1896"], ["Mariage", "Avec Simon Émile LANG, Hagenthal-le-Bas, 9 mai 1921 (mention marginale relue le 24/10/2026)", "mention", "Mention marginale de son acte de naissance"], ["Lien", "Mère de Joseph Aloyse LANG", "mention", "Acte de décès de Joseph, n°85/2022"]], "variants": ["AMANN (arbre nalfredroger)"]}, "aloysel": {"sosa": 16, "given": "Aloyse", "surname": "LANG", "br": "lang", "children": ["simon"], "spouse": "eugenie", "parents": ["jeanl", "schoen"], "birth": {"d": "27 févr. 1845", "p": "Hagenthal-le-Haut", "s": "proved", "src": "Acte de naissance n°7/1845, Hagenthal-le-Haut (Archives d'Alsace, 5Mi202/2, vue 370) : né à 13 h, déclaré par son père ; confirmé par l'acte de mariage n°3/1879"}, "death": {"d": "1920", "p": "", "s": "family", "src": "Arbre Geneanet nalfredroger, à prouver"}, "facts": [["Métier", "Cultivateur (« Ackerer »)", "proved", "Actes n°3/1879 et n°5/1896"], ["Mariage", "Avec Eugénie PFAU, 16 octobre 1879, Hagenthal-le-Haut", "proved", "Acte de mariage n°3/1879"], ["Parents", "Jean LANG, cultivateur, et Anne Marie SCHOENENBERGER, tous deux décédés en 1879", "mention", "Acte de mariage n°3/1879"]], "variants": ["Alois (actes en allemand)", "Xavier Alois (acte de décès de son père, 1879)"], "note": "Ne pas confondre avec l'Aloyse LANG né en 1827, époux d'Elisabeth HILLMEYER."}, "eugenie": {"sosa": 17, "given": "Eugénie", "surname": "PFAU", "br": "lang", "children": ["simon"], "spouse": "aloysel", "parents": ["francp", "studer"], "birth": {"d": "7 oct. 1856", "p": "Hagenthal-le-Haut", "s": "proved", "src": "Acte de naissance n°14/1856, Hagenthal-le-Haut (Archives d'Alsace, 5Mi202/2, vue 426) : née à 20 h, déclarée le 8 par son père"}, "death": {"d": "19 mars 1944", "p": "", "s": "family", "src": "Arbre Geneanet gilitz47, à prouver"}, "facts": [["Mariage", "Avec Aloyse LANG, 16 octobre 1879, Hagenthal-le-Haut", "proved", "Acte de mariage n°3/1879"], ["Parents", "François PFAU, cultivateur, et Marie Anne STUDER, vivants en 1879", "mention", "Acte de mariage n°3/1879"]], "variants": ["Eugenia (actes en allemand)"]}, "aloysea": {"sosa": 18, "given": "Aloyse", "surname": "AMAN", "br": "lang", "children": ["josephine"], "spouse": "ursule", "parents": ["jacquesa", "schmitt"], "birth": {"d": "22 janv. 1855", "p": "Hagenthal-le-Bas", "s": "proved", "src": "Acte de naissance n°2/1855, Hagenthal-le-Bas (Archives d'Alsace, 5Mi201/4, vue 286) : né à 3 h du matin, déclaré le 23 par son père"}, "death": {"d": "9 avr. 1942", "p": "Hagenthal-le-Bas", "s": "family", "src": "Arbres Geneanet aman67 et sined, à prouver"}, "facts": [["Métier", "Cultivateur (« Ackerer »)", "proved", "Actes n°6/1882 et n°5/1896"], ["Mariage", "Avec Marie Ursule SCHOEFFEL, 23 octobre 1882, Hagenthal-le-Bas", "proved", "Acte de mariage n°6/1882"], ["Parents", "Jacques AMAN, cultivateur, vivant en 1882, et Anne SCHMITT, décédée avant 1882", "mention", "Acte de mariage n°6/1882"]], "variants": ["Alois (actes en allemand)"]}, "ursule": {"sosa": 19, "given": "Marie Ursule", "surname": "SCHOEFFEL", "br": "lang", "children": ["josephine"], "spouse": "aloysea", "parents": ["josephs", "frisch"], "birth": {"d": "11 déc. 1856", "p": "Hagenthal-le-Bas", "s": "proved", "src": "Acte de naissance n°31/1856, Hagenthal-le-Bas (Archives d'Alsace, 5Mi201/4, vue 302) : née à 23 h, déclarée le 12 par son père"}, "death": {"d": "7 nov. 1927", "p": "Hagenthal-le-Bas", "s": "family", "src": "Arbre sined ; registre indexé sur Geneanet, à prouver"}, "facts": [["Mariage", "Avec Aloyse AMAN, 23 octobre 1882, Hagenthal-le-Bas", "proved", "Acte de mariage n°6/1882"], ["Parents", "Joseph SCHOEFFEL, cultivateur, et Marie Ursule FRISCH, vivants en 1882", "mention", "Acte de mariage n°6/1882"]], "variants": ["Maria Ursula (actes en allemand)"]}, "jacquessal": {"sosa": 130, "given": "Jacques", "surname": "SALADIN", "br": "lang", "children": ["saladin"], "spouse": "brogly", "death": {"d": "avant 1849", "p": "", "s": "mention", "src": "Dit décédé dans l'acte de décès de sa fille (1849)"}}, "brogly": {"sosa": 131, "given": "Anne Marie", "surname": "BROGLY", "br": "lang", "children": ["saladin"], "spouse": "jacquessal", "death": {"d": "avant 1849", "p": "", "s": "mention", "src": "Dite décédée dans l'acte de décès de sa fille (1849)"}}, "henris": {"sosa": 132, "given": "Henri", "surname": "SCHOENENBERGER", "br": "lang", "children": ["aloisschoen"], "spouse": "hoffinger", "death": {"d": "avant 1807", "p": "", "s": "mention", "src": "Dit défunt dans l'acte de mariage de son fils (1807)"}, "facts": [["Domicile", "Le couple vivait au village natal de leur fils, bailliage de Dornach (Soleure, Suisse)", "mention", "Acte de mariage de 1807"]]}, "hoffinger": {"sosa": 133, "given": "Barbara", "surname": "HOFFINGER ?", "br": "lang", "children": ["aloisschoen"], "spouse": "henris", "death": {"d": "avant 1807", "p": "", "s": "mention", "src": "Dite défunte dans l'acte de mariage de son fils (1807)"}, "facts": [["Nom", "Lecture incertaine", "check", "Acte de mariage de 1807"]]}, "josephross": {"sosa": 134, "given": "Joseph", "surname": "ROSS", "br": "lang", "children": ["stross"], "spouse": "turbin", "death": {"d": "avant 1807", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Dit défunt, mort à Niederhagenthal (actes de 1807 et 1816)"}, "facts": [["Métier", "Journalier", "mention", "Acte de remariage de sa fille, 1816"]]}, "turbin": {"sosa": 135, "given": "Anne Marie", "surname": "TURBIN ?", "br": "lang", "children": ["stross"], "spouse": "josephross", "facts": [["Statut", "Veuve, présente et consentante aux mariages de sa fille en 1807 et en 1816 (ne sait pas signer)", "mention", "Actes de 1807 et 1816"], ["Nom", "Lecture incertaine (Turbin, Turban, Surbein ?)", "check", "Actes de 1807 et 1816"]]}, "georgesst": {"sosa": 140, "given": "Georges", "surname": "STUDER", "br": "lang", "children": ["josephst"], "spouse": "stablin", "death": {"d": "avant 1816", "p": "", "s": "mention", "src": "Dit défunt dans l'acte de mariage de son fils (1816)"}}, "stablin": {"sosa": 141, "given": "Marianne", "surname": "STÄBLIN ?", "br": "lang", "children": ["josephst"], "spouse": "georgesst", "facts": [["Statut", "Présente et consentante au mariage de son fils en 1816 ; fait sa marque", "mention", "Acte de mariage de 1816"], ["Nom", "Lecture probable (« Stäblin »)", "check", "Acte de mariage de 1816"]]}, "christian": {"sosa": 142, "given": "Christian", "surname": "LANG", "br": "lang", "children": ["catlang"], "spouse": "annemarie1793", "birth": {"d": "vers 1766", "p": "Hagenthal-le-Haut", "s": "mention", "src": "27 ans en janvier 1793 ; 50 ans en 1816 (témoin au mariage de sa fille)"}, "facts": [["Mariage", "Avec Anne Marie LANG, 25 janvier 1793, Hagenthal-le-Haut ; soldat au 5e bataillon de la garde nationale ; signe « Christian Lang »", "proved", "Acte de mariage du 25 janvier 1793, Oberhagenthal, en allemand (Archives d'Alsace, 5Mi202/4, vue 3)"], ["Parents", "Johann LANG et Josepha K… (nom mal lisible), domiciliés à Oberhagenthal", "mention", "Acte de mariage de 1793"], ["Métier", "Laboureur en 1816", "mention", "Acte de mariage de sa fille, 1816"], ["Raccordement", "Hypothèse ancienne (mariage « avril 1793 ») désormais rattachée par une chaîne continue d'actes ; la date lue est le 25 janvier 1793", "proved", "Actes de 1793, 1816, n°5/1818, n°3/1844, n°14/1856, n°5/1896"]], "note": "L'acte de 1793 mentionne une parenté entre les époux (dispense, lecture probable) : les deux portent le nom LANG."}, "annemarie1793": {"sosa": 143, "given": "Anne Marie", "surname": "LANG", "br": "lang", "children": ["catlang"], "spouse": "christian", "birth": {"d": "vers 1763 ?", "p": "", "s": "check", "src": "Âge mal lisible dans l'acte de 1793 (« trente » probable)"}, "facts": [["Mariage", "Avec Christian LANG, 25 janvier 1793, Hagenthal-le-Haut ; ne sait pas écrire (marque)", "proved", "Acte de mariage de 1793"], ["Parents", "… Joseph LANG et Franziska W… (noms mal lisibles), domiciliés à O… (lecture incertaine)", "check", "Acte de mariage de 1793"], ["Statut", "Vivante en 1816, présente au mariage de sa fille", "mention", "Acte de mariage de 1816"]], "variants": ["Anna Maria (acte en allemand)"]}, "henria": {"sosa": 144, "given": "Henri", "surname": "AMAN", "br": "lang", "children": ["josepha"], "spouse": "heninger", "facts": [["Statut", "Cultivateur, vivant en 1808, présent et consentant au mariage de son fils", "mention", "Acte de mariage de 1808"]]}, "heninger": {"sosa": 145, "given": "Rose", "surname": "HENINGER ?", "br": "lang", "children": ["josepha"], "spouse": "henria", "death": {"d": "6 avril 1803 (16 germinal an XI)", "p": "", "s": "mention", "src": "Acte de mariage de son fils (1808)"}, "facts": [["Nom", "Lecture incertaine (Heninger, Hüninger ?)", "check", "Acte de mariage de 1808"]]}, "jeanadamk": {"sosa": 146, "given": "Jean Adam", "surname": "KUENTZ", "br": "lang", "children": ["kuentzm"], "spouse": "niglim", "facts": [["Statut", "Laboureur, présent et consentant au mariage de sa fille en 1808", "mention", "Acte de mariage de 1808"]]}, "niglim": {"sosa": 147, "given": "Madeleine", "surname": "NIGLI", "br": "lang", "children": ["kuentzm"], "spouse": "jeanadamk", "facts": [["Statut", "Présente et consentante au mariage de sa fille en 1808", "mention", "Acte de mariage de 1808"]]}, "josephsch": {"sosa": 148, "given": "Joseph", "surname": "SCHMITT", "br": "lang", "children": ["josephsm"], "spouse": "mullerj", "death": {"d": "20 nov. 1815", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Acte de mariage de son fils (1817)"}}, "mullerj": {"sosa": 149, "given": "Jeanne", "surname": "MÜLLER", "br": "lang", "children": ["josephsm"], "spouse": "josephsch", "death": {"d": "avant 1817", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Dite défunte dans l'acte de mariage de son fils (1817) ; date mal lisible"}}, "jeandop": {"sosa": 150, "given": "Jean", "surname": "DOPPLER", "br": "lang", "children": ["doppler"], "spouse": "kuentzam", "facts": [["Statut", "Laboureur, présent et consentant au mariage de sa fille en 1817 ; signe « Johannes Dopler »", "mention", "Acte de mariage de 1817"]], "variants": ["Dopler, Dobler"]}, "kuentzam": {"sosa": 151, "given": "Anne Marie", "surname": "KUENTZ", "br": "lang", "children": ["doppler"], "spouse": "jeandop", "facts": [["Statut", "Présente et consentante au mariage de sa fille en 1817", "mention", "Acte de mariage de 1817"]]}, "josephsch2": {"sosa": 152, "given": "Joseph", "surname": "SCHOEFFEL", "br": "lang", "children": ["josephs2"], "spouse": "dobleram", "death": {"d": "30 oct. 1808", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Acte de mariage de son fils, n°6/1813"}}, "dobleram": {"sosa": 153, "given": "Anne Marie", "surname": "DOBLER", "br": "lang", "children": ["josephs2"], "spouse": "josephsch2", "death": {"d": "3 déc. 1796 (13 frimaire an V)", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Acte de mariage de son fils, n°6/1813"}, "variants": ["Doppler"]}, "josephk": {"sosa": 154, "given": "Joseph", "surname": "KUENTZ", "br": "lang", "children": ["kuentzc"], "spouse": "niglic", "facts": [["Statut", "Laboureur à Hagenthal-le-Haut, présent et consentant au mariage de sa fille en 1813", "mention", "Acte de mariage n°6/1813"]]}, "niglic": {"sosa": 155, "given": "Catherine", "surname": "NIGLI", "br": "lang", "children": ["kuentzc"], "spouse": "josephk", "facts": [["Statut", "Domiciliée à Hagenthal-le-Haut, présente au mariage de sa fille en 1813", "mention", "Acte de mariage n°6/1813"], ["Nom", "Lecture probable", "check", "Acte de mariage n°6/1813"]]}, "francoisl": {"sosa": 64, "given": "Jean", "surname": "LANG", "br": "lang", "children": ["jeanl"], "spouse": "saladin", "note": "Autre enfant connu du couple : Anne Marie LANG, veuve de Johann HAMMERLE (?), morte à Hagenthal-le-Haut le 25 déc. 1876 à 85 ans (acte de décès n°11/1876), donc née vers 1791. Le couple s'est marié avant 1791 : registres paroissiaux.", "death": {"d": "1797 (an V)", "p": "Hagenthal-le-Haut", "s": "mention", "src": "Dit décédé à Oberhagenthal en 1797 dans l'acte de mariage de son fils, n°3/1837"}, "facts": [["Métier", "Cultivateur", "mention", "Acte de mariage n°3/1837"], ["Prénom", "Jean (« Johann ») : confirmé par l'acte de décès de son fils (1879) et par une relecture de l'acte de 1837 ; la lecture « François » était erronée", "mention", "Actes n°3/1837 et n°3/1879"]]}, "saladin": {"sosa": 65, "given": "Barbe", "surname": "SALADIN", "br": "lang", "children": ["jeanl"], "spouse": "francoisl", "parents": ["jacquessal", "brogly"], "birth": {"d": "vers 1763", "p": "Hagenthal-le-Haut", "s": "mention", "src": "86 ans à son décès en 1849, « née en cette commune »"}, "death": {"d": "19 déc. 1849", "p": "Hagenthal-le-Haut", "s": "proved", "src": "Acte de décès de 1849, Hagenthal-le-Haut (Archives d'Alsace, 5Mi202/3, vue 251) ; déclarants : Jean LANG, cultivateur, et Xavier MESCHLY (?), maçon, 46 ans"}, "facts": [["Statut", "Vivante en 1837, sans état, domiciliée à Hagenthal-le-Haut, présente au mariage de son fils", "mention", "Acte de mariage n°3/1837"], ["Remariage", "Dite « veuve de Meschly (?) Xavier » en 1849 : remariée après la mort de Jean LANG (1797) ; nom mal lisible", "check", "Acte de décès de 1849"]]}, "aloisschoen": {"sosa": 66, "given": "Urs Victor", "surname": "SCHOENENBERGER", "br": "lang", "children": ["schoen"], "spouse": "stross", "parents": ["henris", "hoffinger"], "birth": {"d": "vers 1776", "p": "Bailliage de Dornach, canton de Soleure (Suisse)", "s": "mention", "src": "31 ans en août 1807 ; village natal mal lisible (« Lochlen » ?) dans l'acte de mariage de 1807"}, "death": {"d": "1814", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Acte de mariage de sa fille, n°3/1837 (décès attesté par un acte de notoriété)"}, "facts": [["Mariage", "Avec Marie Anne ROSS, 17 août 1807, Hagenthal-le-Bas ; « garçon domestique » domicilié à Niederhagenthal depuis deux ans", "proved", "Acte de mariage du 17 août 1807, Niederhagenthal (Archives d'Alsace, 5Mi201/5, vue 82)"], ["Métier", "Domestique en 1807 ; journalier en 1814 (« Fischer », pêcheur, selon l'acte de 1873)", "mention", "Actes de 1807, n°3/1837 et n°6/1873"], ["Prénom", "Urs Victor (« Urs » seul en 1816, 1837 et 1873)", "proved", "Acte de mariage de 1807"]], "variants": ["Schönenberger, Schoenberger (orthographes des actes)"]}, "stross": {"sosa": 67, "given": "Marie Anne", "surname": "ROSS", "br": "lang", "children": ["schoen"], "spouse": "aloisschoen", "parents": ["josephross", "turbin"], "birth": {"d": "vers 1779-1781", "p": "Hagenthal-le-Bas", "s": "mention", "src": "28 ans en 1807, 35 ans en 1816 ; « née et domiciliée » à Niederhagenthal"}, "facts": [["Mariage", "Avec Urs Victor SCHOENENBERGER, 17 août 1807, Hagenthal-le-Bas", "proved", "Acte de mariage de 1807 (Archives d'Alsace, 5Mi201/5, vue 82)"], ["Remariage", "Avec Pierre SCHMITT, tonnelier, 30 ans, fils de feu André SCHMITT, le 5 mai 1816 à Hagenthal-le-Bas ; ne sait pas signer (marque)", "proved", "Acte de mariage du 5 mai 1816 (Archives d'Alsace, 5Mi201/5, vue 136)"], ["Nom", "ROSS : lu « Ross » en 1837 et en 1873 (et non Stross) ; en 1807 et 1816 l'initiale ressemble à « Fl » mais les témoins de la famille signent « Roß »", "mention", "Actes de 1807, 1816, n°3/1837 et n°6/1873"]], "variants": ["Roß (signatures des témoins Jean et André ROSS)", "Floss / Flosse (lecture possible de l'initiale)"]}, "jacquesp": {"sosa": 68, "given": "Jacques", "surname": "PFAU", "br": "lang", "children": ["francp"], "spouse": "stahler", "birth": {"d": "vers 1771", "p": "", "s": "mention", "src": "33 ans le 1er mars 1804 (acte de naissance de son fils)"}, "facts": [["Métier", "Cultivateur (« Ackermann »)", "proved", "Acte de naissance de son fils, an XII"]], "variants": ["Jacob (acte en allemand)"], "death": {"d": "1er oct. 1842", "p": "Hagenthal-le-Haut", "s": "mention", "src": "Acte de mariage de son fils, n°3/1844 (relu le 24/10/2026)"}}, "stahler": {"sosa": 69, "given": "Barbe", "surname": "LANG", "br": "lang", "children": ["francp"], "spouse": "jacquesp", "death": {"d": "avant 1844", "p": "Hagenthal-le-Haut", "s": "mention", "src": "Dite défunte dans l'acte n°3/1844"}, "facts": [["Identité", "« Bürgerin Barbara Lang », épouse de Jacob PFAU, mère de Frantz (1804)", "proved", "Acte de naissance de son fils, 10 ventôse an XII"], ["Note", "La lecture « Stahler » faite sur l'acte de 1844 était erronée ; l'acte de naissance, déclaré par le père, fait foi", "mention", "Acte de naissance an XII"]], "variants": ["Barbara (acte en allemand)"]}, "josephst": {"sosa": 70, "given": "Joseph", "surname": "STUDER", "br": "lang", "children": ["studer"], "spouse": "catlang", "parents": ["georgesst", "stablin"], "birth": {"d": "vers 1788", "p": "", "s": "mention", "src": "30 ans en avril 1818 (acte de naissance de sa fille)"}, "facts": [["Mariage", "Avec Catherine LANG, 10 septembre 1816, Hagenthal-le-Haut ; cordonnier, 28 ans", "proved", "Acte de mariage du 10 sept. 1816, Oberhagenthal (Archives d'Alsace, 5Mi202/4, vue 148)"], ["Métier", "Cordonnier (1816, 1818) ; cultivateur en 1844", "mention", "Actes de 1816, n°5/1818 et n°3/1844"], ["Statut", "Vivant en 1844, à Hagenthal-le-Haut", "mention", "Acte de mariage de sa fille, n°3/1844"]]}, "catlang": {"sosa": 71, "given": "Catherine", "surname": "LANG", "br": "lang", "children": ["studer"], "spouse": "josephst", "parents": ["christian", "annemarie1793"], "birth": {"d": "vers 1793", "p": "Hagenthal-le-Haut", "s": "mention", "src": "23 ans en sept. 1816, 25 ans en avril 1818 ; « née et domiciliée » à Oberhagenthal"}, "note": "C'est par elle que l'arbre rejoint le couple Christian LANG – Anne Marie LANG (mariage de 1793) : chaîne continue d'actes de naissance et de mariage depuis Simon Émile LANG (1896) → Eugénie PFAU (1856) → Marie Anne Catherine STUDER (1818) → Catherine LANG.", "facts": [["Mariage", "Avec Joseph STUDER, 10 septembre 1816, Hagenthal-le-Haut ; fille de Christian LANG et d'Anne Marie LANG, tous deux présents et consentants (Christian signe)", "proved", "Acte de mariage du 10 sept. 1816 (Archives d'Alsace, 5Mi202/4, vue 148)"], ["Statut", "Vivante en 1844, à Hagenthal-le-Haut", "mention", "Acte de mariage de sa fille, n°3/1844"]]}, "josepha": {"sosa": 72, "given": "Joseph", "surname": "AMAN", "br": "lang", "children": ["jacquesa"], "spouse": "kuentzm", "parents": ["henria", "heninger"], "birth": {"d": "vers 1769", "p": "Hagenthal-le-Bas", "s": "mention", "src": "46 ans en juillet 1815, né et domicilié à Niederhagenthal (acte n°19/1815)"}, "facts": [["Mariage", "Avec Madeleine KUENTZ, 7 février 1808, Hagenthal-le-Bas ; tonnelier, 38 ans, veuf de Catherine BRUNNER (?)", "proved", "Acte de mariage du 7 févr. 1808, Niederhagenthal (Archives d'Alsace, 5Mi201/5, vue 87)"], ["Métier", "Tonnelier (1808, 1815, 1817)", "proved", "Actes de 1808 et n°19/1815"]], "death": {"d": "14 mars 1838", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Acte de mariage de son fils, n°6/1849"}}, "kuentzm": {"sosa": 73, "given": "Madeleine", "surname": "KUENTZ", "br": "lang", "children": ["jacquesa"], "spouse": "josepha", "parents": ["jeanadamk", "niglim"], "birth": {"d": "vers 1775", "p": "Hagenthal-le-Bas", "s": "mention", "src": "33 ans en février 1808, « née et domiciliée » à Niederhagenthal"}, "facts": [["Mariage", "Avec Joseph AMAN, 7 février 1808, Hagenthal-le-Bas ; signe « Magdalena Kuentz »", "proved", "Acte de mariage de 1808"], ["Statut", "Veuve, présente et consentante au mariage de son fils en 1849", "mention", "Acte de mariage n°6/1849"]]}, "josephsm": {"sosa": 74, "given": "Joseph", "surname": "SCHMITT", "br": "lang", "children": ["schmitt"], "spouse": "doppler", "parents": ["josephsch", "mullerj"], "birth": {"d": "28 janv. 1787", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Date de naissance citée dans son acte de mariage du 9 avril 1817 (30 ans)"}, "facts": [["Mariage", "Avec Anne DOPPLER, 9 avril 1817, Hagenthal-le-Bas ; laboureur, adjoint au maire ; veuf en premières noces d'Agnès SCHOEFFEL, morte le 22 mai 1814", "proved", "Acte de mariage du 9 avril 1817, Niederhagenthal (Archives d'Alsace, 5Mi201/5, vue 144)"], ["Métier", "Laboureur ; adjoint au maire en 1817", "mention", "Actes de 1817 et n°5/1818"]], "death": {"d": "20 juin 1832", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Acte de mariage de sa fille, n°6/1849"}}, "doppler": {"sosa": 75, "given": "Anne", "surname": "DOPPLER", "br": "lang", "children": ["schmitt"], "spouse": "josephsm", "parents": ["jeandop", "kuentzam"], "birth": {"d": "5 nov. 1797 (15 brumaire an VI)", "p": "Hagenthal-le-Bas", "s": "mention", "src": "Date citée dans son acte de mariage du 9 avril 1817 (19 ans, mineure)"}, "facts": [["Mariage", "Avec Joseph SCHMITT, 9 avril 1817, Hagenthal-le-Bas ; signe « Anna Dobler »", "proved", "Acte de mariage de 1817"], ["Statut", "Veuve, présente et consentante au mariage de sa fille en 1849", "mention", "Acte de mariage n°6/1849"]], "variants": ["Dopler (orthographe de l'acte)"]}, "josephs2": {"sosa": 76, "given": "Joseph", "surname": "SCHOEFFEL", "br": "lang", "children": ["josephs"], "spouse": "kuentzc", "parents": ["josephsch2", "dobleram"], "birth": {"d": "vers 1789-1790", "p": "Hagenthal-le-Bas", "s": "mention", "src": "23 ans en avril 1813, 30 ans en 1819, 64 ans en 1853 : concordant"}, "facts": [["Mariage", "Avec Catherine KUENTZ, 7 avril 1813, Hagenthal-le-Bas ; laboureur, 23 ans", "proved", "Acte de mariage n°6/1813, Niederhagenthal (Archives d'Alsace, 5Mi201/5, vue 123)"], ["Métier", "Laboureur (1819), cultivateur (1853)", "mention", "Actes n°27/1819 et n°3/1853"], ["Père", "Dit « fils de Joseph » dans l'acte de 1819 : son père s'appelait aussi Joseph SCHOEFFEL", "mention", "Acte de naissance de son fils, n°27/1819"], ["Statut", "Vivant en 1853, à Hagenthal-le-Bas", "mention", "Acte de mariage de son fils, n°3/1853"]]}, "kuentzc": {"sosa": 77, "given": "Catherine", "surname": "KUENTZ", "br": "lang", "children": ["josephs"], "spouse": "josephs2", "parents": ["josephk", "niglic"], "birth": {"d": "vers 1781-1785", "p": "Hagenthal-le-Haut ?", "s": "mention", "src": "28 ans en 1813 (vers 1785) mais 38 ans en 1819 et 71 ans en 1853 (vers 1781) : écart à garder ; domiciliée à Oberhagenthal en 1813"}, "facts": [["Mariage", "Avec Joseph SCHOEFFEL, 7 avril 1813, Hagenthal-le-Bas", "proved", "Acte de mariage n°6/1813"], ["Nom", "KUENTZ : lu dans les actes de 1819 et de 1853", "mention", "Actes n°27/1819 et n°3/1853"]]}, "jeanf": {"sosa": 78, "given": "Jean", "surname": "FRISCH", "br": "lang", "children": ["frisch"], "spouse": "wanner", "death": {"d": "14 avr. 185?", "p": "Hégenheim", "s": "mention", "src": "Acte de mariage de sa fille, n°3/1853 (année mal lisible)"}, "facts": [["Métier", "Cultivateur à Hégenheim", "mention", "Acte n°3/1853"]]}, "wanner": {"sosa": 79, "given": "Marie Ursule", "surname": "WANNER", "br": "lang", "children": ["frisch"], "spouse": "jeanf", "death": {"d": "avant 1853", "p": "Hégenheim", "s": "mention", "src": "Dite défunte dans l'acte n°3/1853"}, "facts": [["Nom", "WANNER : lecture incertaine en 1853, confirmée par l'acte de naissance de sa fille", "proved", "Acte de naissance n°11/1827, Hégenheim"]]}, "jeanl": {"sosa": 32, "given": "Jean Xavier", "surname": "LANG", "br": "lang", "children": ["aloysel"], "spouse": "schoen", "parents": ["francoisl", "saladin"], "death": {"d": "25 févr. 1879", "p": "Hagenthal-le-Haut", "s": "proved", "src": "Acte de décès n°3/1879, Oberhagenthal (Archives d'Alsace, 5Mi202/5, vue 45) : 84 ans, veuf d'Anne Marie SCHOENENBERGER, fils de feus Jean LANG et Barbara SALADIN ; déclaré par son fils Xavier Alois LANG, cultivateur"}, "birth": {"d": "vers 1795", "p": "Hagenthal-le-Haut", "s": "mention", "src": "Âges déclarés incohérents : 40 ans en 1837 (vers 1797), 45 ans en 1845 (vers 1800), 84 ans en 1879 (vers 1795) ; acte de naissance à chercher (1794-1797)"}, "facts": [["Métier", "Journalier en 1845 ; cultivateur (« Ackerer ») en 1879", "mention", "Actes n°7/1845 et n°3/1879"], ["Prénoms", "Jean Xavier (« Johann Xaver ») : le « Xavier » lu en 1845 est confirmé", "proved", "Acte de décès n°3/1879"], ["Mariage", "Avec Anne Marie SCHOENENBERGER, 12 juillet 1837, Hagenthal-le-Haut", "proved", "Acte de mariage n°3/1837, Hagenthal-le-Haut (Archives d'Alsace, 5Mi202/4, vue 224)"], ["Parents", "Jean LANG, cultivateur, décédé en 1797 (an V), et Barbe SALADIN, vivante en 1837", "mention", "Acte de décès n°3/1879 (explicite) ; acte de mariage n°3/1837 (prénom du père mal écrit)"], ["Domicile", "Dernier domicile à Hagenthal-le-Haut", "mention", "Acte de mariage n°3/1879"]], "variants": ["Johann (acte en allemand)"]}, "schoen": {"sosa": 33, "given": "Anne Marie", "surname": "SCHOENENBERGER", "br": "lang", "children": ["aloysel"], "spouse": "jeanl", "parents": ["aloisschoen", "stross"], "birth": {"d": "vers 1809", "p": "Hagenthal-le-Bas", "s": "mention", "src": "28 ans en 1837 (acte n°3/1837), 64 ans à son décès en 1873 : les deux concordent"}, "death": {"d": "13 sept. 1873", "p": "Hagenthal-le-Haut", "s": "proved", "src": "Acte de décès n°6/1873, Oberhagenthal (Archives d'Alsace, 5Mi202/5, vue 4) : épouse de Jean Xavier LANG, née à Niederhagenthal, fille de feus Urs SCHOENENBERGER et Marie Anne ROSS ; déclarée par son fils Alois LANG"}, "facts": [["Mariage", "Avec Jean LANG, 12 juillet 1837, Hagenthal-le-Haut", "proved", "Acte de mariage n°3/1837"], ["Parents", "Urs SCHOENENBERGER, journalier, décédé à Hagenthal-le-Bas en 1814, et Marie Anne ROSS, remariée à Pierre SCHMITT, tonnelier", "mention", "Actes n°3/1837 et n°6/1873 concordants (les lectures « Alois » et « Stross » étaient erronées)"]], "variants": ["Anna Maria (acte en allemand)"]}, "francp": {"sosa": 34, "given": "François", "surname": "PFAU", "br": "lang", "children": ["eugenie"], "spouse": "studer", "parents": ["jacquesp", "stahler"], "birth": {"d": "1er mars 1804", "p": "Hagenthal-le-Haut", "s": "proved", "src": "Acte de naissance du 10 ventôse an XII, Oberhagenthal (Archives d'Alsace, 5Mi202/2, vue 116), en allemand : « Frantz Pfau », né le matin, déclaré par son père Jacob PFAU, 33 ans, cultivateur ; concorde avec l'acte de mariage n°3/1844"}, "note": "Veuf en premières noces de Marie Anne ULLMANN quand il épouse Marie Anne Catherine STUDER le 17 juillet 1844 (acte n°3/1844, Archives d'Alsace, 5Mi202/4, vue 266).", "facts": [["Métier", "Cultivateur (« Ackerer »)", "mention", "Acte de mariage de sa fille, n°3/1879"], ["Statut", "Vivant en 1879, domicilié à Hagenthal-le-Haut", "mention", "Acte de mariage n°3/1879"]], "variants": ["Franz (acte en allemand)"]}, "studer": {"sosa": 35, "given": "Marie Anne Catherine", "surname": "STUDER", "br": "lang", "children": ["eugenie"], "spouse": "francp", "parents": ["josephst", "catlang"], "birth": {"d": "29 avr. 1818", "p": "Hagenthal-le-Haut", "s": "proved", "src": "Acte de naissance n°5/1818, Oberhagenthal (Archives d'Alsace, 5Mi202/2, vue 209) : née à 10 h, déclarée par son père Joseph STUDER, 30 ans ; mère Catherine LANG, 25 ans ; prénoms « Marianne Catherine »"}, "facts": [["Mariage", "Avec François PFAU, veuf, 17 juillet 1844, Hagenthal-le-Haut", "proved", "Acte de mariage n°3/1844"], ["Statut", "Vivante en 1879, domiciliée à Hagenthal-le-Haut", "mention", "Acte de mariage de sa fille, n°3/1879"]], "variants": ["Maria Anna (acte en allemand)"]}, "jacquesa": {"sosa": 36, "given": "Jacques", "surname": "AMAN", "br": "lang", "children": ["aloysea"], "spouse": "schmitt", "parents": ["josepha", "kuentzm"], "birth": {"d": "22 juil. 1815", "p": "Hagenthal-le-Bas", "s": "proved", "src": "Acte de naissance n°19/1815, Niederhagenthal (Archives d'Alsace, 5Mi201/3, vue 223) : né à 2 h du matin, déclaré par son père Joseph AMAN, 46 ans, tonnelier (lecture probable) ; mère Madelaine KUENTZ ; concorde avec l'acte de mariage n°6/1849"}, "note": "Ses frères Henri AMAN (garde champêtre, 43 ans) et Fridolin AMAN (cordonnier, 35 ans) sont témoins de la naissance d'Aloyse en 1855.", "facts": [["Métier", "Cultivateur (« Ackerer »)", "mention", "Acte de mariage de son fils, n°6/1882, Hagenthal-le-Bas"], ["Statut", "Vivant en 1882, domicilié à Hagenthal-le-Bas ; probablement témoin au mariage de son fils", "mention", "Acte de mariage n°6/1882"]], "variants": ["Jakob (acte en allemand)"]}, "schmitt": {"sosa": 37, "given": "Anne", "surname": "SCHMITT", "br": "lang", "children": ["aloysea"], "spouse": "jacquesa", "parents": ["josephsm", "doppler"], "birth": {"d": "15 avr. 1818", "p": "Hagenthal-le-Bas", "s": "proved", "src": "Acte de naissance n°5/1818, Niederhagenthal (Archives d'Alsace, 5Mi201/3, vue 250) : « Anna », déclarée par son père Joseph SCHMITT, laboureur, né et domicilié dans la commune ; mère Anna DOPLER ; confirmé par la table décennale 1813-1822 (« Schmid Anne, 15 avril 1818 »)"}, "facts": [["Mariage", "Avec Jacques AMAN, 5 novembre 1849, Hagenthal-le-Bas", "proved", "Acte de mariage n°6/1849, Hagenthal-le-Bas (Archives d'Alsace, 5Mi201/5, vue 316)"]], "death": {"d": "avant le 23 oct. 1882", "p": "", "s": "mention", "src": "Dite décédée dans l'acte de mariage de son fils, n°6/1882"}, "variants": ["Anna (acte en allemand)"]}, "josephs": {"sosa": 38, "given": "Joseph", "surname": "SCHOEFFEL", "br": "lang", "children": ["ursule"], "spouse": "frisch", "parents": ["josephs2", "kuentzc"], "birth": {"d": "23 oct. 1819", "p": "Hagenthal-le-Bas", "s": "proved", "src": "Acte de naissance n°27/1819, Niederhagenthal (Archives d'Alsace, 5Mi201/3, vue 265), déclaré le 24 par son père Joseph SCHOEFFEL, fils de Joseph, laboureur, 30 ans ; mère Catherine KUENTZ, 38 ans"}, "variants": ["Dit « Agathe » ou « Agathes » (surnom de famille, acte n°31/1856)"], "facts": [["Métier", "Cultivateur (« Ackerer »)", "mention", "Acte de mariage de sa fille, n°6/1882"], ["Statut", "Vivant en 1882, domicilié à Hagenthal-le-Bas ; un Joseph SCHOEFFEL, cultivateur, est témoin du mariage", "mention", "Acte de mariage n°6/1882"]]}, "frisch": {"sosa": 39, "given": "Marie Ursule", "surname": "FRISCH", "br": "lang", "children": ["ursule"], "spouse": "josephs", "parents": ["jeanf", "wanner"], "birth": {"d": "13 févr. 1827", "p": "Hégenheim", "s": "proved", "src": "Acte de naissance n°11/1827, Hégenheim (Archives d'Alsace, 5Mi207/6, vue 212) : jumelle de Materne FRISCH ; déclarés par leur père Jean FRISCH, cultivateur, environ 40 ans ; mère Marie Ursule WANNER"}, "note": "Mariée à Hagenthal-le-Bas le 23 avril 1853 avec Joseph SCHOEFFEL (acte n°3/1853, Archives d'Alsace, 5Mi201/5, vue 335) ; son frère Jean FRISCH, cultivateur à Hégenheim, est témoin.", "facts": [["Statut", "Vivante en 1882, domiciliée à Hagenthal-le-Bas", "mention", "Acte de mariage de sa fille, n°6/1882"]], "variants": ["Maria Ursula (acte en allemand)"]}, "albert": {"sosa": 10, "given": "Albert", "surname": "NAAS", "br": "naas", "children": ["aline"], "spouse": "marieanne", "facts": [["Lien", "Père d'Aline Germaine NAAS", "mention", "Acte de décès d'Aline, n°160/2019"]]}, "marieanne": {"sosa": 11, "given": "Marie Anne", "surname": "STARK", "br": "naas", "children": ["aline"], "spouse": "albert", "facts": [["Lien", "Mère d'Aline Germaine NAAS", "mention", "Acte de décès d'Aline, n°160/2019"]], "variants": ["Maria NAAS-STARCK (arbre Geneanet) : prénom et nom à trancher"], "note": "À trancher avec l'acte de naissance d'Aline à Allschwil ou le mariage LANG–NAAS."}, "henri": {"sosa": 12, "given": "Henri", "surname": "STEFFAN", "br": "steffan", "birth": {"d": "21 févr. 1913", "p": "Kogenheim (Bas-Rhin)", "s": "mention", "src": "Acte de naissance de son fils Roger, Huningue n°52/1938 (relu le 16/10/2026)"}, "children": ["roger"], "spouse": "louise", "facts": [["Métier", "Coiffeur (1938)", "proved", "Acte de naissance de Roger, n°52/1938"], ["Signature", "Signe « Steffan Henri » comme déclarant de la naissance de Roger", "proved", "Acte n°52/1938"]], "variants": ["Haguenau : lecture erronée antérieure, l'acte porte bien Kogenheim"]}, "louise": {"sosa": 13, "given": "Louise", "surname": "MULLER", "br": "steffan", "birth": {"d": "27 sept. 1917", "p": "Huningue", "s": "mention", "src": "Acte de naissance de son fils Roger, Huningue n°52/1938 (relu le 16/10/2026)"}, "children": ["roger"], "spouse": "henri", "facts": [["Métier", "Ouvrière de fabrique (1938)", "proved", "Acte de naissance de Roger, n°52/1938"]], "variants": ["Louisa (arbre Geneanet) ; l'acte donne clairement Louise"]}, "serafino": {"sosa": 14, "given": "Serafino", "surname": "MARGANI", "br": "margani", "birth": {"d": "21 août 1906", "p": "Balsorano (Italie)", "s": "mention", "src": "Acte de décès, Saint-Louis n°196/1999 ; acte italien demandé (prot. n°6542)"}, "death": {"d": "9 sept. 1999", "p": "Saint-Louis", "s": "proved", "src": "Acte de décès, Saint-Louis n°196/1999"}, "parents": ["domenico", "celestet"], "spouse": "santa", "children": ["aristide", "celeste", "mariam", "liliane"], "facts": [["Métier", "Maçon (retraité au décès)", "proved", "Acte de décès n°196/1999"], ["Mariage", "Avec Santa TUZI ; date et lieu inconnus (avant déc. 1930 ?)", "family", "Demandé à Balsorano"]], "variants": ["Séraphino (acte de décès d'Aristide)"]}, "santa": {"sosa": 15, "given": "Santa", "surname": "TUZI", "br": "margani", "birth": {"d": "17 mai 1909", "p": "Balsorano (Italie)", "s": "mention", "src": "Acte de décès, Saint-Louis n°72/1996 ; acte italien demandé (prot. n°6542)"}, "death": {"d": "21 mars 1996", "p": "Saint-Louis", "s": "proved", "src": "Acte de décès, Saint-Louis n°72/1996"}, "parents": ["cesidio", "mariat"], "spouse": "serafino", "children": ["aristide", "celeste", "mariam", "liliane"], "variants": ["TUCCI (acte de décès d'Aristide, contredit par les autres actes)"], "facts": [["Statut", "Épouse de « Sérafino » MARGANI au décès (il lui survit)", "proved", "Acte de décès n°72/1996"]]}, "domenico": {"sosa": 28, "given": "Domenico", "surname": "MARGANI", "br": "margani", "children": ["serafino"], "spouse": "celestet", "facts": [["Lien", "Père de Serafino MARGANI", "mention", "Acte de décès de Serafino, n°196/1999"]]}, "celestet": {"sosa": 29, "given": "Celeste", "surname": "TROIANI", "br": "margani", "children": ["serafino"], "spouse": "domenico", "facts": [["Lien", "Mère de Serafino MARGANI", "mention", "Acte de décès de Serafino, n°196/1999"]]}, "cesidio": {"sosa": 30, "given": "Césidio", "surname": "TUZI", "br": "margani", "children": ["santa"], "spouse": "mariat", "facts": [["Lien", "Père de Santa TUZI", "mention", "Acte de décès de Santa, n°72/1996"]], "variants": ["Gesidio (arbre Geneanet) : à corriger ou garder en variante"]}, "mariat": {"sosa": 31, "given": "Maria", "surname": "TUZI", "br": "margani", "children": ["santa"], "spouse": "cesidio", "facts": [["Lien", "Mère de Santa TUZI", "mention", "Acte de décès de Santa, n°72/1996"]]}, "aristide": {"given": "Aristide", "surname": "MARGANI", "br": "margani", "rel": "Frère de Céleste", "birth": {"d": "1er déc. 1930", "p": "Balsorano (Italie)", "s": "mention", "src": "Acte de décès, Saint-Louis n°308/2012 ; acte italien demandé"}, "death": {"d": "10 déc. 2012", "p": "Saint-Louis", "s": "proved", "src": "Acte de décès, Saint-Louis n°308/2012"}, "parents": ["serafino", "santa"], "spouse": "nazarena", "facts": [["Métier", "Maçon (retraité au décès)", "proved", "Acte de décès n°308/2012"]], "note": "Son acte écrit « Séraphino MARGANI » et « Santa TUCCI » : variantes notées, formes retenues Serafino et TUZI."}, "nazarena": {"given": "Nazarena", "surname": "VILLA", "br": "margani", "rel": "Épouse d'Aristide", "spouse": "aristide", "death": {"d": "avant le 10 déc. 2012", "p": "", "s": "mention", "src": "Aristide déclaré veuf dans son acte de décès"}}, "mariam": {"given": "Maria", "surname": "MARGANI", "br": "margani", "rel": "Sœur de Céleste, ép. SCHMITT", "parents": ["serafino", "santa"], "facts": [], "note": "Personne vivante : dates, lieux et actes ne sont pas affichés sur la version en ligne."}, "liliane": {"given": "Liliane", "surname": "MARGANI", "br": "margani", "rel": "Sœur de Céleste, ép. CIOL", "parents": ["serafino", "santa"], "facts": [], "note": "Personne vivante : dates, lieux et actes ne sont pas affichés sur la version en ligne."}};
+const PENDING = [["Naissance de Joseph Aloyse LANG (18/03/1927) + mariage LANG–NAAS", "Hagenthal-le-Haut", "Relance envoyée le 25/10/2026 (mairie@hagenthallehaut.fr)"], ["Décès de Joséphine AMAN (1982), d'Aloyse LANG (~1920) et d'Eugénie PFAU (1944)", "Hagenthal-le-Haut", "Envoyé le 25/10/2026, dans le même mail"], ["Mariage Simon Émile LANG – Joséphine AMAN (9 mai 1921)", "Hagenthal-le-Bas", "Envoyé le 25/10/2026 (mairie@hagenthal-le-bas.com)"], ["Décès de Marie Ursule SCHOEFFEL (1927) et d'Aloyse AMAN (1942)", "Hagenthal-le-Bas", "Envoyé le 25/10/2026, dans le même mail"], ["Copie de la naissance de Joséphine Marie AMAN (1896)", "Hagenthal-le-Bas", "Envoi par courrier annoncé le 19/10/2026 (acte déjà lu en ligne)"], ["Décès de Simon Émile LANG (21/06/1978, n°140)", "Saint-Louis", "Envoyé le 25/10/2026 (secretariat.general@ville-saint-louis.fr)"], ["Naissance de Louise MULLER (1917) et mariage STEFFAN–MULLER", "Huningue", "Envoyé le 25/10/2026 (mairie@ville-huningue.fr)"], ["Naissance d'Henri STEFFAN (21/02/1913)", "Kogenheim", "Envoyé le 25/10/2026 (secretariat.mairie@kogenheim.fr)"], ["Baptême d'Aline NAAS (1937), mariage NAAS–STARK et baptêmes", "Paroisse catholique d'Allschwil", "Baptême en recherche (réponse du 19/10) ; complément envoyé le 25/10/2026"]];
+/* ---------- Registre des actes ----------
+   st : "lu" = lu en ligne aux Archives d'Alsace ; "copie" = copie intégrale reçue de la mairie ; "attendu" = demandé, pas encore reçu
+   p  : [id, rôle] ; les images ne sont pas reproduites ici (conditions de réutilisation des Archives d'Alsace) */
+const AD = "https://archives68.alsace.eu/ark:/46858/";
+const REGS = {
+  hhN:["t9174jk0fmdh","Hagenthal-le-Haut, naissances 1793-1862"], hbN1:["c9zg7frxmskn","Hagenthal-le-Bas, naissances 1793-1820"],
+  hbN2:["kpwdsz2vh453","Hagenthal-le-Bas, naissances 1821-1862"], hhM:["nqkzwc9dg583","Hagenthal-le-Haut, mariages 1793-1862"],
+  hbM:["1l2scjvhp7fm","Hagenthal-le-Bas, mariages 1793-1862"], hhD:["38mfkr6qblh7","Hagenthal-le-Haut, décès 1793-1862"],
+  hhD2:["vrtq2nhxlfdp","Hagenthal-le-Haut, décès 1873-1882"], hhN3:["klr5mhzj06sw","Hagenthal-le-Haut, naissances 1893-1902"],
+  hbN3:["j09pq1n73wcg","Hagenthal-le-Bas, naissances 1893-1902"], hhM2:["j3mcr0vhs1nd","Hagenthal-le-Haut, mariages 1873-1882"],
+  hbM2:["m9kxlq15z7rb","Hagenthal-le-Bas, mariages 1873-1882"], hegN:["gt1ljh36b50d","Hégenheim, naissances 1810-1852"],
+  hbTD:["2zx9kq46dmt5","Hagenthal-le-Bas, tables décennales 1803-1872"],
+};
+const ACTS = [{"id": "d2022", "t": "Décès", "d": "7 avril 2022", "c": "Saint-Louis", "n": "85/2022", "st": "copie", "p": [["joseph", "défunt"], ["simon", "père cité"], ["josephine", "mère citée"], ["aline", "épouse citée"]], "r": "Né le 18 mars 1927 à Hagenthal-le-Haut ; soudeur retraité ; fils de « Simon, Emile LANG » et de « Joséphine, Marie AMAN » ; veuf d'Aline NAAS. Déclarant non parent : les parents sont une mention."}, {"id": "d2019", "t": "Décès", "d": "23 août 2019", "c": "Saint-Louis", "n": "160/2019", "st": "copie", "p": [["aline", "défunte"], ["albert", "père cité"], ["marieanne", "mère citée"], ["joseph", "époux cité"]], "r": "Née le 30 octobre 1937 à Allschwil (Suisse) ; fille d'Albert NAAS et de « Marie, Anne STARK » ; épouse de Joseph Aloyse LANG."}, {"id": "n1938", "t": "Naissance", "d": "30 août 1938", "c": "Huningue", "n": "52/1938", "st": "copie", "p": [["roger", "enfant"], ["henri", "père, déclarant"], ["louise", "mère"]], "r": "Fils d'Henri STEFFAN, coiffeur, né à Kogenheim le 21/02/1913, et de Louise MULLER, née à Huningue le 27/09/1917. Marges : mariage à Huningue le 21/07/1961 avec Céleste MARGANI ; décès à Saint-Louis le 28/11/2021."}, {"id": "d2021", "t": "Décès", "d": "28 novembre 2021", "c": "Saint-Louis", "n": "213/2021", "st": "copie", "p": [["roger", "défunt"], ["henri", "père cité"], ["louise", "mère citée"]], "r": "Né le 30/08/1938 à Huningue ; cadre retraité ; concorde en tout point avec l'acte de naissance."}, {"id": "d1999", "t": "Décès", "d": "9 septembre 1999", "c": "Saint-Louis", "n": "196/1999", "st": "copie", "p": [["serafino", "défunt"], ["domenico", "père cité"], ["celestet", "mère citée"], ["santa", "épouse citée (décédée)"]], "r": "Né à Balsorano le 21/08/1906 ; maçon retraité ; fils de Domenico MARGANI et Celeste TROIANI ; veuf de Santa TUZI."}, {"id": "d1996", "t": "Décès", "d": "21 mars 1996", "c": "Saint-Louis", "n": "72/1996", "st": "copie", "p": [["santa", "défunte"], ["cesidio", "père cité"], ["mariat", "mère citée"], ["serafino", "époux cité"]], "r": "Née à Balsorano le 17/05/1909 ; fille de « Césidio TUZI » et de Maria TUZI ; épouse de « Sérafino » MARGANI."}, {"id": "d2012", "t": "Décès", "d": "10 décembre 2012", "c": "Saint-Louis", "n": "308/2012", "st": "copie", "p": [["aristide", "défunt"], ["serafino", "père cité"], ["santa", "mère citée"], ["nazarena", "épouse citée (décédée)"]], "r": "Né le 01/12/1930 à Balsorano ; parents écrits « Séraphino MARGANI » et « Santa TUCCI » (variantes)."}, {"id": "n1896s", "t": "Naissance", "d": "27 octobre 1896", "c": "Hagenthal-le-Haut", "n": "5/1896", "st": "lu", "reg": "hhN3", "v": 30, "p": [["simon", "enfant"], ["aloysel", "père, déclarant"], ["eugenie", "mère"]], "r": "« Simon Emil », fils d'Alois LANG, cultivateur, et d'Eugenia née PFAU. Marge : décès à Saint-Louis le 21/06/1978. Revérifié le 24/10/2026."}, {"id": "n1896j", "t": "Naissance", "d": "15 février 1896", "c": "Hagenthal-le-Bas", "n": "5/1896", "st": "lu", "reg": "hbN3", "v": 51, "p": [["josephine", "enfant"], ["aloysea", "père, déclarant"], ["ursule", "mère"], ["simon", "époux (mention marginale)"]], "r": "« Josephine Maria », fille d'Alois AMAN, cultivateur, et de Maria Ursula née SCHOEFFEL. Marge : mariée à Hagenthal-le-Bas le 9 mai 1921 avec LANG Simon Emile (mention portée le 11/05/1921) ; décès en 1982. Revérifié le 24/10/2026."}, {"id": "m1879", "t": "Mariage", "d": "16 octobre 1879", "c": "Hagenthal-le-Haut", "n": "3/1879", "st": "lu", "reg": "hhM2", "v": 44, "p": [["aloysel", "époux"], ["eugenie", "épouse"], ["jeanl", "père de l'époux (décédé)"], ["schoen", "mère de l'époux (décédée)"], ["francp", "père de l'épouse"], ["studer", "mère de l'épouse"]], "r": "Alois LANG, né le 27/02/1845, fils de feus Johann LANG et Anna Maria née SCHOENENBERGER ; Eugenia PFAU, née le 07/10/1856, fille de Franz PFAU et Maria Anna née STUDER. Revérifié le 24/10/2026."}, {"id": "m1882", "t": "Mariage", "d": "23 octobre 1882", "c": "Hagenthal-le-Bas", "n": "6/1882", "st": "lu", "reg": "hbM2", "v": 84, "p": [["aloysea", "époux"], ["ursule", "épouse"], ["jacquesa", "père de l'époux"], ["schmitt", "mère de l'époux (décédée)"], ["josephs", "père de l'épouse"], ["frisch", "mère de l'épouse"]], "r": "Alois AMAN, né le 22/01/1855, fils de Jakob AMAN et de feue Anna née SCHMITT ; Maria Ursula SCHOEFFEL, née le 11/12/1856, fille de Joseph SCHOEFFEL et Maria Ursula née FRISCH. Revérifié le 24/10/2026."}, {"id": "n1845", "t": "Naissance", "d": "27 février 1845", "c": "Hagenthal-le-Haut", "n": "7/1845", "st": "lu", "reg": "hhN", "v": 370, "p": [["aloysel", "enfant"], ["jeanl", "père, déclarant"], ["schoen", "mère"]], "r": "Déclaré par « Jean LANG dit Xaveris », journalier, 45 ans ; mère Anne Marie SCHOENENBERGER, 35 ans. Revérifié le 24/10/2026."}, {"id": "n1856e", "t": "Naissance", "d": "7 octobre 1856", "c": "Hagenthal-le-Haut", "n": "14/1856", "st": "lu", "reg": "hhN", "v": 426, "p": [["eugenie", "enfant"], ["francp", "père, déclarant"], ["studer", "mère"]], "r": "Déclarée le 8 par François PFAU, cultivateur, 53 ans ; mère Marie Anne STUDER, « quarante et un ans » (elle en a en réalité 38). Revérifié le 24/10/2026."}, {"id": "n1855", "t": "Naissance", "d": "22 janvier 1855", "c": "Hagenthal-le-Bas", "n": "2/1855", "st": "lu", "reg": "hbN2", "v": 286, "p": [["aloysea", "enfant"], ["jacquesa", "père, déclarant"], ["schmitt", "mère"]], "r": "Déclaré par Jacques AMAN, cultivateur, 39 ans ; mère Anne SCHMITT, 37 ans ; témoins Henri AMAN (43 ans) et Fridolin AMAN (35 ans, cordonnier), frères du déclarant. Revérifié le 24/10/2026."}, {"id": "n1856u", "t": "Naissance", "d": "11 décembre 1856", "c": "Hagenthal-le-Bas", "n": "31/1856", "st": "lu", "reg": "hbN2", "v": 302, "p": [["ursule", "enfant"], ["josephs", "père, déclarant"], ["frisch", "mère"]], "r": "Déclarée par Joseph SCHOEFFEL dit « Agathe », cultivateur, 37 ans ; mère Marie Ursule FRISCH, 30 ans. Revérifié le 24/10/2026."}, {"id": "m1837", "t": "Mariage", "d": "12 juillet 1837", "c": "Hagenthal-le-Haut", "n": "3/1837", "st": "lu", "reg": "hhM", "v": 224, "p": [["jeanl", "époux"], ["schoen", "épouse"], ["francoisl", "père de l'époux (décédé en 1797)"], ["saladin", "mère de l'époux"], ["aloisschoen", "père de l'épouse (décédé en 1814)"], ["stross", "mère de l'épouse"]], "r": "Jean LANG, 40 ans, né à Oberhagenthal ; le prénom de son père est mal écrit (relu « Jean » grâce à l'acte de décès de 1879). Anne Marie SCHOENENBERGER, 28 ans, fille de feu Urs et de Marie Anne ROSS remariée SCHMITT."}, {"id": "m1844", "t": "Mariage", "d": "17 juillet 1844", "c": "Hagenthal-le-Haut", "n": "3/1844", "st": "lu", "reg": "hhM", "v": 266, "p": [["francp", "époux (veuf ULLMANN)"], ["studer", "épouse"], ["jacquesp", "père de l'époux (décédé 1er oct. 1842)"], ["stahler", "mère de l'époux (décédée)"], ["josephst", "père de l'épouse"], ["catlang", "mère de l'épouse"]], "r": "François PFAU, 40 ans, né le 10 ventôse an XII ; fils de feu Jacques PFAU et de feue Barbe LANG (relu le 24/10/2026 : « Barbe Lang », ce qui corrige l'ancienne lecture « Stahler »). Épouse née le 29/04/1818, fille de Joseph STUDER et Catherine LANG."}, {"id": "m1849", "t": "Mariage", "d": "5 novembre 1849", "c": "Hagenthal-le-Bas", "n": "6/1849", "st": "lu", "reg": "hbM", "v": 316, "p": [["jacquesa", "époux"], ["schmitt", "épouse"], ["josepha", "père de l'époux (décédé 14 mars 1838)"], ["kuentzm", "mère de l'époux"], ["josephsm", "père de l'épouse (décédé 20 juin 1832)"], ["doppler", "mère de l'épouse"]], "r": "Jacques AMAN, né le 22/07/1815 ; Anne SCHMITT, née en avril 1818 ; les deux mères, veuves, sont présentes et consentantes."}, {"id": "m1853", "t": "Mariage", "d": "23 avril 1853", "c": "Hagenthal-le-Bas", "n": "3/1853", "st": "lu", "reg": "hbM", "v": 335, "p": [["josephs", "époux"], ["frisch", "épouse"], ["josephs2", "père de l'époux"], ["kuentzc", "mère de l'époux"], ["jeanf", "père de l'épouse (décédé)"], ["wanner", "mère de l'épouse (décédée)"]], "r": "Joseph SCHOEFFEL, né le 23/10/1819 ; Marie Ursule FRISCH, née le 13/02/1827 à Hégenheim ; son frère Jean FRISCH est témoin."}, {"id": "d1879", "t": "Décès", "d": "25 février 1879", "c": "Hagenthal-le-Haut", "n": "3/1879", "st": "lu", "reg": "hhD2", "v": 45, "p": [["jeanl", "défunt"], ["schoen", "épouse citée (décédée)"], ["francoisl", "père cité"], ["saladin", "mère citée"]], "r": "Johann Xaver LANG, 84 ans, fils de feus Johann LANG et Barbara SALADIN ; déclaré par son fils Xavier Alois LANG."}, {"id": "d1873", "t": "Décès", "d": "13 septembre 1873", "c": "Hagenthal-le-Haut", "n": "6/1873", "st": "lu", "reg": "hhD2", "v": 4, "p": [["schoen", "défunte"], ["jeanl", "époux cité"], ["aloisschoen", "père cité"], ["stross", "mère citée"], ["aloysel", "fils, déclarant"]], "r": "64 ans, née à Niederhagenthal, fille de feus Urs SCHOENENBERGER et Marie Anne ROSS."}, {"id": "d1849", "t": "Décès", "d": "19 décembre 1849", "c": "Hagenthal-le-Haut", "n": "1849", "st": "lu", "reg": "hhD", "v": 251, "p": [["saladin", "défunte"], ["jacquessal", "père cité"], ["brogly", "mère citée"], ["jeanl", "déclarant"]], "r": "Barbe SALADIN, 86 ans, née dans la commune, veuve « Meschly (?) Xavier », fille de Jacques SALADIN et Anne Marie BROGLY."}, {"id": "d1876", "t": "Décès", "d": "25 décembre 1876", "c": "Hagenthal-le-Haut", "n": "11/1876", "st": "lu", "reg": "hhD2", "p": [["francoisl", "père cité"], ["saladin", "mère citée"]], "r": "Anne Marie LANG, 85 ans, veuve HAMMERLE (?), sœur de Jean Xavier LANG."}, {"id": "n1804", "t": "Naissance", "d": "1er mars 1804 (10 ventôse an XII)", "c": "Hagenthal-le-Haut", "n": "an XII", "st": "lu", "reg": "hhN", "v": 116, "p": [["francp", "enfant"], ["jacquesp", "père, déclarant"], ["stahler", "mère"]], "r": "En allemand : « Frantz Pfau », déclaré par son père Jacob PFAU, 33 ans, cultivateur ; mère « Bürgerin Barbara Lang »."}, {"id": "n1818s", "t": "Naissance", "d": "29 avril 1818", "c": "Hagenthal-le-Haut", "n": "5/1818", "st": "lu", "reg": "hhN", "v": 209, "p": [["studer", "enfant"], ["josephst", "père, déclarant"], ["catlang", "mère"]], "r": "« Marianne Catherine », déclarée par son père Joseph STUDER, 30 ans ; mère Catherine LANG, 25 ans."}, {"id": "n1819", "t": "Naissance", "d": "23 octobre 1819", "c": "Hagenthal-le-Bas", "n": "27/1819", "st": "lu", "reg": "hbN1", "v": 265, "p": [["josephs", "enfant"], ["josephs2", "père, déclarant"], ["kuentzc", "mère"]], "r": "Déclaré le 24 par Joseph SCHOEFFEL, fils de Joseph, laboureur, 30 ans ; mère Catherine KUENTZ, 38 ans."}, {"id": "n1818a", "t": "Naissance", "d": "15 avril 1818", "c": "Hagenthal-le-Bas", "n": "5/1818", "st": "lu", "reg": "hbN1", "v": 250, "p": [["schmitt", "enfant"], ["josephsm", "père, déclarant"], ["doppler", "mère"]], "r": "« Anna », fille de Joseph SCHMITT, laboureur, et d'Anna DOPLER. Confirmé par la table décennale 1813-1822 (« Schmid Anne, 15 avril 1818 »)."}, {"id": "n1815", "t": "Naissance", "d": "22 juillet 1815", "c": "Hagenthal-le-Bas", "n": "19/1815", "st": "lu", "reg": "hbN1", "v": 223, "p": [["jacquesa", "enfant"], ["josepha", "père, déclarant"], ["kuentzm", "mère"]], "r": "Né à 2 h du matin ; père Joseph AMAN, 46 ans, tonnelier ; mère Madelaine KUENTZ."}, {"id": "n1827", "t": "Naissance", "d": "13 février 1827", "c": "Hégenheim", "n": "11/1827", "st": "lu", "reg": "hegN", "v": 212, "p": [["frisch", "enfant"], ["jeanf", "père, déclarant"], ["wanner", "mère"]], "r": "Jumelle de Materne FRISCH ; père Jean FRISCH, cultivateur, environ 40 ans ; mère Marie Ursule WANNER."}, {"id": "m1807", "t": "Mariage", "d": "17 août 1807", "c": "Hagenthal-le-Bas", "n": "1807", "st": "lu", "reg": "hbM", "v": 82, "p": [["aloisschoen", "époux"], ["stross", "épouse"], ["henris", "père de l'époux (décédé)"], ["hoffinger", "mère de l'époux (décédée)"], ["josephross", "père de l'épouse (décédé)"], ["turbin", "mère de l'épouse"]], "r": "Urs Victor SCHÖNENBERGER, 31 ans, garçon domestique, né dans le bailliage de Dornach (canton de Soleure) ; Marie Anne ROSS, 28 ans. Noms des mères mal lisibles."}, {"id": "m1816r", "t": "Mariage", "d": "5 mai 1816", "c": "Hagenthal-le-Bas", "n": "1816", "st": "lu", "reg": "hbM", "v": 136, "p": [["stross", "épouse (veuve SCHOENENBERGER)"], ["josephross", "père de l'épouse (décédé)"], ["turbin", "mère de l'épouse"]], "r": "Remariage de Marie Anne ROSS, 35 ans, avec Pierre SCHMITT, tonnelier, 30 ans."}, {"id": "m1816", "t": "Mariage", "d": "10 septembre 1816", "c": "Hagenthal-le-Haut", "n": "1816", "st": "lu", "reg": "hhM", "v": 148, "p": [["josephst", "époux"], ["catlang", "épouse"], ["georgesst", "père de l'époux (décédé)"], ["stablin", "mère de l'époux"], ["christian", "père de l'épouse, témoin"], ["annemarie1793", "mère de l'épouse"]], "r": "Joseph STUDER, 28 ans, cordonnier ; Catherine LANG, 23 ans, fille de Christian LANG et d'Anne Marie LANG, présents et consentants. Acte-clé qui rattache le couple de 1793."}, {"id": "m1808", "t": "Mariage", "d": "7 février 1808", "c": "Hagenthal-le-Bas", "n": "1808", "st": "lu", "reg": "hbM", "v": 87, "p": [["josepha", "époux (veuf)"], ["kuentzm", "épouse"], ["henria", "père de l'époux"], ["heninger", "mère de l'époux (décédée 1803)"], ["jeanadamk", "père de l'épouse"], ["niglim", "mère de l'épouse"]], "r": "Joseph AMAN, 38 ans, tonnelier, veuf de Catherine BRUNNER (?) ; Madeleine KUENTZ, 33 ans."}, {"id": "m1813", "t": "Mariage", "d": "7 avril 1813", "c": "Hagenthal-le-Bas", "n": "6/1813", "st": "lu", "reg": "hbM", "v": 123, "p": [["josephs2", "époux"], ["kuentzc", "épouse"], ["josephsch2", "père de l'époux (décédé 1808)"], ["dobleram", "mère de l'époux (décédée 1796)"], ["josephk", "père de l'épouse"], ["niglic", "mère de l'épouse"]], "r": "Joseph SCHOEFFEL, 23 ans, laboureur ; Catherine KUENTZ, 28 ans, d'Oberhagenthal."}, {"id": "m1817", "t": "Mariage", "d": "9 avril 1817", "c": "Hagenthal-le-Bas", "n": "1817", "st": "lu", "reg": "hbM", "v": 144, "p": [["josephsm", "époux (veuf SCHOEFFEL)"], ["doppler", "épouse"], ["josephsch", "père de l'époux (décédé 1815)"], ["mullerj", "mère de l'époux (décédée)"], ["jeandop", "père de l'épouse"], ["kuentzam", "mère de l'épouse"]], "r": "Joseph SCHMITT, né le 28/01/1787, adjoint au maire ; Anne DOPPLER, née le 15 brumaire an VI, 19 ans."}, {"id": "m1793", "t": "Mariage", "d": "25 janvier 1793", "c": "Hagenthal-le-Haut", "n": "1793", "st": "lu", "reg": "hhM", "v": 3, "p": [["christian", "époux"], ["annemarie1793", "épouse"]], "r": "En allemand. Christian LANG, 27 ans, soldat au 5e bataillon de la garde nationale, fils de Johann LANG et Josepha K… ; Anne Marie LANG, fille de … Joseph LANG et Franziska W… (lectures incertaines)."}, {"id": "a1927", "t": "Naissance", "d": "18 mars 1927", "c": "Hagenthal-le-Haut", "n": "—", "st": "attendu", "p": [["joseph", "enfant"], ["simon", "père attendu"], ["josephine", "mère attendue"]], "r": "Demandé à la mairie : confirmera le seul lien encore établi par un acte de décès."}, {"id": "a1921", "t": "Mariage", "d": "9 mai 1921", "c": "Hagenthal-le-Bas", "n": "—", "st": "attendu", "p": [["simon", "époux"], ["josephine", "épouse"]], "r": "Date confirmée par la mention marginale ; copie intégrale à demander."}, {"id": "a1961", "t": "Mariage", "d": "21 juillet 1961", "c": "Huningue", "n": "—", "st": "attendu", "p": [["roger", "époux"]], "r": "Copie intégrale demandée le 16/10/2026."}, {"id": "aHS", "t": "Naissance", "d": "21 février 1913", "c": "Kogenheim", "n": "—", "st": "attendu", "p": [["henri", "enfant"]], "r": "Demande préparée."}, {"id": "aLM", "t": "Naissance", "d": "27 septembre 1917", "c": "Huningue", "n": "—", "st": "attendu", "p": [["louise", "enfant"]], "r": "Demande préparée."}, {"id": "aAN", "t": "Baptême", "d": "1937", "c": "Allschwil (paroisse)", "n": "—", "st": "attendu", "p": [["aline", "enfant"], ["albert", "père"], ["marieanne", "mère"]], "r": "Acte pas encore retrouvé par la paroisse."}, {"id": "aBal", "t": "Naissances et mariage", "d": "1906-1938", "c": "Balsorano", "n": "prot. 6542", "st": "attendu", "p": [["serafino", "naissance"], ["santa", "naissance"], ["aristide", "naissance"]], "r": "Demande en cours auprès de la commune."}];
+const ST_ACT = {copie:["proved","Copie reçue"], lu:["mention","Lu en ligne"], attendu:["family","Attendu"]};
+const actsOf = id => ACTS.filter(a=>a.p.some(([q])=>q===id));
+
+/* ---------- Contrôles de cohérence (vérification complète du 24/10/2026) ---------- */
+const CHECKS = [
+  ["ok",["simon","josephine","joseph"],"Simon Émile et Joséphine : les deux actes de naissance de 1896 donnent la même date de mariage (9 mai 1921, Hagenthal-le-Bas) ; Joseph naît en 1927, six ans après."],
+  ["ok",["simon","aloysel","eugenie"],"Simon Émile (1896) : père Alois 51 ans, mère Eugénie 40 ans ; mariés en 1879 : plausible."],
+  ["ok",["aloysel","jeanl","schoen"],"Aloyse LANG : la date de naissance (27/02/1845) est identique dans l'acte de naissance et l'acte de mariage de 1879 ; parents identiques dans les deux actes."],
+  ["ok",["josephine","aloysea","ursule"],"Joséphine (1896) : parents mariés en 1882 ; Alois 41 ans, Marie Ursule 39 ans : plausible."],
+  ["ok",["aloysea","ursule"],"Aloyse AMAN et Marie Ursule SCHOEFFEL : dates de naissance identiques entre leurs actes de naissance et leur acte de mariage de 1882."],
+  ["ok",["eugenie","francp","studer"],"Eugénie PFAU : date de naissance identique dans l'acte de naissance (1856) et l'acte de mariage (1879)."],
+  ["warn",["studer","eugenie"],"Marie Anne STUDER est dite âgée de 41 ans en 1856 alors qu'elle en a 38 (née le 29/04/1818) : erreur d'âge courante ; identité sûre par les noms et le mariage de 1844."],
+  ["ok",["francp","jacquesp","stahler"],"François PFAU : naissance du 10 ventôse an XII confirmée par l'acte de mariage de 1844, qui donne la même date et les mêmes parents (Jacques PFAU et Barbe LANG)."],
+  ["ok",["studer","catlang","josephst"],"Marie Anne Catherine STUDER : naissance en avril 1818, parents mariés en septembre 1816 ; le père a 28 ans en 1816 et 30 ans en 1818 : cohérent."],
+  ["ok",["catlang","christian","annemarie1793"],"Catherine LANG, 23 ans en septembre 1816 et 25 ans en avril 1818 : née vers 1793, après le mariage de ses parents (25 janvier 1793). Christian a 27 ans en 1793 et 50 ans en 1816 : cohérent."],
+  ["warn",["jeanl"],"Jean Xavier LANG : âges incohérents d'un acte à l'autre (40 ans en 1837, 45 ans en 1845, 84 ans en 1879) ; naissance à situer entre 1794 et 1797 (son père meurt en 1797). Acte de naissance non trouvé à ce jour."],
+  ["ok",["jeanl","francoisl","saladin"],"Parents de Jean Xavier : l'acte de décès de 1879 nomme Jean LANG et Barbara SALADIN ; l'acte de mariage de 1837 est mal écrit sur le prénom du père mais nomme bien Barbe SALADIN, présente. La lecture « François » est abandonnée."],
+  ["ok",["schoen","aloisschoen","stross"],"Anne Marie SCHOENENBERGER : 28 ans en 1837 et 64 ans en 1873 (née vers 1809) ; ses parents se marient en août 1807 et le père meurt en 1814 : cohérent. Parents identiques en 1837 et en 1873."],
+  ["warn",["stross"],"Marie Anne ROSS : 28 ans en 1807 mais 35 ans en 1816 (vers 1779-1781). Le nom est lu « Ross » en 1837 et 1873 ; l'initiale des actes de 1807 et 1816 est ambiguë."],
+  ["ok",["jacquesa","josepha","kuentzm"],"Jacques AMAN : né le 22/07/1815, 34 ans en 1849, 39 ans en 1855 : concordant. Son père a 38 ans en 1808 et 46 ans en 1815 : cohérent."],
+  ["ok",["schmitt","josephsm","doppler"],"Anne SCHMITT : née le 15/04/1818, un an après le mariage de ses parents (09/04/1817) ; 37 ans en 1855 : concordant ; mère âgée de 20 ans à sa naissance."],
+  ["ok",["josephs","josephs2","kuentzc"],"Joseph SCHOEFFEL : né le 23/10/1819 ; 37 ans en décembre 1856 : concordant ; parents mariés en 1813."],
+  ["warn",["kuentzc"],"Catherine KUENTZ : 28 ans en 1813 (vers 1785) mais 38 ans en 1819 et 71 ans en 1853 (vers 1781). Écart de 4 ans laissé en note."],
+  ["ok",["frisch","jeanf","wanner"],"Marie Ursule FRISCH : née le 13/02/1827, 26 ans au mariage de 1853, 30 ans en 1856 : concordant. Le nom WANNER est confirmé par son acte de naissance."],
+  ["ok",["saladin","jacquessal","brogly"],"Barbe SALADIN, 86 ans en 1849 (née vers 1763) : mère de Jean Xavier vers 32 ans et d'Anne Marie vers 28 ans : plausible."],
+  ["warn",["joseph","simon","josephine"],"Seul lien de la branche encore établi par un acte de décès (déclarant non parent) : Joseph Aloyse → Simon Émile et Joséphine. Son acte de naissance de 1927 est demandé à la mairie."],
+  ["warn",["aloysel","eugenie","aloysea","ursule"],"Les décès d'Aloyse LANG (1920), Eugénie PFAU (1944), Aloyse AMAN (1942) et Marie Ursule SCHOEFFEL (1927) ne viennent que d'arbres en ligne : à prouver."],
+];
+
+const FIXES = [
+  ["Joseph Aloyse LANG : décès le 7 avril 2022","Geneanet indique 2023"],
+  ["Gesidio TUZI → Césidio TUZI","Garder « Gesidio » en variante"],
+  ["Louisa MULLER → Louise MULLER","D'après l'acte de naissance de Roger"],
+  ["Roger STEFFAN : ajouter lieux, métier, parents et mariage du 21/07/1961","Actes n°52/1938 et n°213/2021"],
+  ["Ajouter Nazarena VILLA, épouse d'Aristide","Acte de décès d'Aristide n°308/2012"],
+  ["Maria NAAS-STARCK : ne pas fusionner","Attendre un acte direct (Marie Anne STARK dans l'acte d'Aline)"],
+  ["Henri STEFFAN : né à Kogenheim (Bas-Rhin), pas à Haguenau","Acte de naissance de Roger n°52/1938"],
+  ["Mariage Christian LANG – Anne Marie LANG : 25 janvier 1793 (et non avril)","Acte de 1793, Oberhagenthal ; rattaché par une chaîne continue d'actes via Catherine LANG"],
+];
+
+
+/* ---------- Disposition de l'arbre ---------- */
+const NW = 140, NH = 88, LX = 112, PAD = 24;
+const TOP = 128, RG = 150;           // marge haute (en-têtes de côtés) et pas entre générations
+const ROWS = [
+  {r:"VIII",s:"Génération VIII"}, {r:"VII",s:"Génération VII"}, {r:"VI", s:"Quadrisaïeuls"}, {r:"V", s:"Trisaïeuls"},
+  {r:"IV", s:"Bisaïeuls"}, {r:"III",s:"Grands-parents"}, {r:"II", s:"Parents"}, {r:"I", s:"Nathan et sa sœur"},
+].map((r,i)=>({...r,y:TOP+i*RG}));
+const COUPLES = [
+  ["jacquessal","brogly",["saladin"],12], ["henris","hoffinger",["aloisschoen"],27], ["josephross","turbin",["stross"],42], ["georgesst","stablin",["josephst"],57], ["christian","annemarie1793",["catlang"],72], ["henria","heninger",["josepha"],87], ["jeanadamk","niglim",["kuentzm"],102], ["josephsch","mullerj",["josephsm"],117], ["jeandop","kuentzam",["doppler"],132], ["josephsch2","dobleram",["josephs2"],147], ["josephk","niglic",["kuentzc"],162],
+  ["francoisl","saladin",["jeanl"],14], ["aloisschoen","stross",["schoen"],22], ["jacquesp","stahler",["francp"],30], ["josephst","catlang",["studer"],38], ["josepha","kuentzm",["jacquesa"],46], ["josephsm","doppler",["schmitt"],54], ["josephs2","kuentzc",["josephs"],62], ["jeanf","wanner",["frisch"],70],
+  ["jeanl","schoen",["aloysel"],14], ["francp","studer",["eugenie"],28], ["jacquesa","schmitt",["aloysea"],42], ["josephs","frisch",["ursule"],56],
+  ["aloysel","eugenie",["simon"]], ["aloysea","ursule",["josephine"]],
+  ["domenico","celestet",["serafino"]], ["cesidio","mariat",["santa"]],
+  ["simon","josephine",["joseph"]], ["albert","marieanne",["aline"]], ["henri","louise",["roger"]], ["serafino","santa",["celeste"]],
+  ["joseph","aline",["denis"]], ["roger","celeste",["nadia"]],
+  ["denis","nadia",["nathan","julie"]],
+];
+const UNKNOWN_PARENTS = [];
+
+/* Placement automatique en arbre d'ascendance : chaque couple est posé exactement au-dessus de son enfant,
+   chaque branche (grand-parent) occupe sa propre colonne, séparée des autres. */
+const SLOT = 152, GAP_BRANCH = 0.9, GAP_SIDE = 2.2;
+const PARENTS = {}; COUPLES.forEach(([a,b,kids])=>kids.forEach(k=>PARENTS[k]=[a,b]));
+const GEN = {}; (function g(id,row){ GEN[id]=row; (PARENTS[id]||[]).forEach(q=>g(q,row-1)); })("nathan",7); GEN.julie=7;
+const POS = {}; let cursor = 0;
+function place(id){
+  const par = PARENTS[id];
+  let x;
+  if(!par){ x = cursor; cursor += 1; }
+  else { const xf = place(par[0]), xm = place(par[1]); x = (xf+xm)/2; }
+  POS[id] = [x*SLOT, GEN[id]]; return x;
+}
+const BRANCHES = [
+  {id:"joseph",  key:"lang",    label:"Branche LANG",    sub:"Joseph Aloyse LANG et ses ancêtres"},
+  {id:"aline",   key:"naas",    label:"Branche NAAS",    sub:"Aline Germaine NAAS"},
+  {id:"roger",   key:"steffan", label:"Branche STEFFAN", sub:"Roger François STEFFAN"},
+  {id:"celeste", key:"margani", label:"Branche MARGANI", sub:"Céleste MARGANI et ses ancêtres"},
+];
+const SUBS = [ {id:"simon", label:"Lignée de Simon Émile LANG"}, {id:"josephine", label:"Lignée de Joséphine AMAN"} ];
+const xJ = place("joseph"); cursor += GAP_BRANCH; const xA = place("aline");
+POS.denis = [((xJ+xA)/2)*SLOT, 6];
+cursor += GAP_SIDE;
+const xR = place("roger"); cursor += GAP_BRANCH; const xC = place("celeste");
+POS.nadia = [((xR+xC)/2)*SLOT, 6];
+const xMid = (POS.denis[0]+POS.nadia[0])/2/SLOT;
+POS.nathan = [(xMid-0.5)*SLOT, 7]; POS.julie = [(xMid+0.5)*SLOT, 7];
+function subtree(id, out=[]){ out.push(id); (PARENTS[id]||[]).forEach(q=>subtree(q,out)); return out; }
+
+/* ---------- Rendu ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pill = s => `<span class="pill ${ST[s][0]}">${ST[s][1]}</span>`;
+function bestStatus(p){
+  const all=[p.birth?.s,p.death?.s,...(p.facts||[]).map(f=>f[2])].filter(Boolean);
+  for(const k of ["proved","mention","check","family"]) if(all.includes(k)) return k;
+  return "family";
+}
+const yearOf = d => (String(d||"").match(/(\d{4})(?!.*\d{4})/)||[])[1];
+function years(p){
+  const b=yearOf(p.birth?.d), d=yearOf(p.death?.d);
+  if(b&&d) return `${b} – ${d}`;
+  if(b) return `° ${/vers/.test(p.birth.d)?"v. ":""}${b}`;
+  if(d) return `† ${/avant/.test(p.death.d)?"av. ":""}${d}`;
+  return p.rel ? p.rel : "dates inconnues";
+}
+function nodeHTML(id, style){
+  const p=P[id], s=bestStatus(p);
+  return `<button class="node${id==="nathan"?" me":""}" data-id="${id}" style="--branch:${BR[p.br]};${style||""}"
+    aria-label="${esc(p.given+" "+p.surname+", "+years(p))}">
+    <span class="top"><span class="sosa">${p.sosa?"Sosa "+p.sosa:"Collatéral"}</span><span class="sdot ${s}" title="${ST[s][1]}"></span></span>
+    <span class="given">${esc(p.given)}</span><span class="surname">${esc(p.surname)}</span><span class="yrs">${esc(years(p))}</span></button>`;
+}
+const X = id => LX + POS[id][0];
+const Y = id => ROWS[POS[id][1]].y;
+const SW = LX + Math.max(...Object.values(POS).map(v=>v[0])) + NW + PAD, SH = ROWS[ROWS.length-1].y + NH + PAD;
+
+function drawTree(){
+  let svg = `<svg width="${SW}" height="${SH}" viewBox="0 0 ${SW} ${SH}" aria-hidden="true">`;
+  ROWS.forEach(r=>{ svg+=`<text class="rowlab" x="4" y="${r.y+30}">${r.r}</text><text class="rowsub" x="4" y="${r.y+50}">${r.s.split(" ").slice(0,2).join(" ")}</text>`;
+    if(r.s.split(" ").length>2) svg+=`<text class="rowsub" x="4" y="${r.y+66}">${r.s.split(" ").slice(2).join(" ")}</text>`; });
+  // côtés et branches
+  const ext = ids => { const xs=ids.map(X), ys=ids.map(Y); return {x0:Math.min(...xs), x1:Math.max(...xs)+NW, y0:Math.min(...ys), y1:Math.max(...ys)+NH}; };
+  const zones = BRANCHES.map(b=>({...b, e:ext(subtree(b.id))}));
+  const sides = [ {label:"Côté paternel", who:"ascendance de Denis LANG", z:[zones[0],zones[1]], col:"var(--b-lang)"},
+                  {label:"Côté maternel", who:"ascendance de Nadia STEFFAN", z:[zones[2],zones[3]], col:"var(--b-steffan)"} ];
+  sides.forEach(sd=>{ const x0=sd.z[0].e.x0-14, x1=sd.z[1].e.x1+14;
+    svg+=`<rect class="side" x="${x0}" y="10" width="${x1-x0}" height="${ROWS[5].y+NH+18-10}" rx="14" style="--c:${sd.col}"/>`;
+    svg+=`<text class="sidelab" x="${x0+16}" y="40">${sd.label.toUpperCase()}</text><text class="sidesub" x="${x0+16}" y="60">${sd.who}</text>`; });
+  zones.forEach(z=>{ const x0=z.e.x0-8, x1=z.e.x1+8, y0=z.e.y0-40, y1=ROWS[5].y+NH+10;
+    svg+=`<rect class="zone" x="${x0}" y="${y0}" width="${x1-x0}" height="${y1-y0}" rx="10" style="--c:${BR[z.key]}"/>`;
+    svg+=`<circle cx="${x0+16}" cy="${y0+16}" r="5" fill="${BR[z.key]}"/><text class="zonelab" x="${x0+27}" y="${y0+21}" style="fill:${BR[z.key]}">${z.label}</text>`; });
+  SUBS.forEach((sb,i)=>{ const e=ext(subtree(sb.id).filter(id=>id!==sb.id)); const x0=e.x0-4, x1=e.x1+4;
+    svg+=`<rect class="subzone" x="${x0}" y="${e.y0-8}" width="${x1-x0}" height="${Y(sb.id)-e.y0+NH+30}" rx="8"/>`;
+    svg+=`<text class="sublab" x="${(x0+x1)/2}" y="${Y(sb.id)+NH+16}" text-anchor="middle">${sb.label}</text>`; });
+  // parents à trouver
+  UNKNOWN_PARENTS.forEach(id=>{ const cx=X(id)+NW/2, y=Y(id);
+    svg+=`<path class="stub" d="M${cx} ${y} V${y-40}"/><text class="stubtxt" x="${cx}" y="${y-46}" text-anchor="middle">?</text>`; });
+  COUPLES.forEach(([a,b,kids,off])=>{
+    const ya=Y(a)+NH/2, x1=X(a)+NW, x2=X(b), mx=(x1+x2)/2;
+    svg+=`<path class="wed" d="M${x1} ${ya} H${x2}"/>`;
+    const yMid = Y(a)+NH+(RG-NH)/2;
+    if(kids.length===1){
+      const cx=X(kids[0])+NW/2;
+      svg+=`<path class="wire" d="M${mx} ${ya} V${yMid} H${cx} V${Y(kids[0])}"/>`;
+    }else{
+      const cs=kids.map(k=>X(k)+NW/2), lo=Math.min(...cs), hi=Math.max(...cs);
+      svg+=`<path class="wire" d="M${mx} ${ya} V${yMid} M${lo} ${yMid} H${hi}"/>`;
+      kids.forEach(k=>svg+=`<path class="wire" d="M${X(k)+NW/2} ${yMid} V${Y(k)}"/>`);
+    }
+    svg+=`<circle class="ring" cx="${mx}" cy="${ya}" r="4.5"/>`;
+  });
+  svg+=`</svg>`;
+  const nodes = Object.keys(POS).map(id=>nodeHTML(id,`left:${X(id)}px;top:${Y(id)}px;width:${NW}px;height:${NH}px`)).join("");
+  $("#stage").style.width=SW+"px"; $("#stage").style.height=SH+"px";
+  $("#stage").innerHTML = svg + nodes;
+}
+
+/* zoom et déplacement */
+let scale = 1;
+function applyScale(s){
+  const sc=$("#scroller"), cx=(sc.scrollLeft+sc.clientWidth/2)/scale, cy=(sc.scrollTop+sc.clientHeight/2)/scale;
+  scale=Math.max(.18,Math.min(1.4,s));
+  $("#stage").style.transform=`scale(${scale})`;
+  $("#sizer").style.width=SW*scale+"px"; $("#sizer").style.height=SH*scale+"px";
+  sc.style.maxHeight = document.querySelector(".board.full") ? "none" : (SH*scale+8)+"px";
+  sc.scrollLeft=cx*scale-sc.clientWidth/2; sc.scrollTop=cy*scale-sc.clientHeight/2;
+}
+function fitScale(){ return Math.max(.18, Math.min(1, ($("#scroller").clientWidth-8)/SW)); }
+function focusOn(ids){
+  const xs=ids.map(X), x0=Math.min(...xs)-30, x1=Math.max(...xs)+NW+30, sc=$("#scroller"), y0=Math.min(...ids.map(Y))-70;
+  applyScale(Math.max(sc.clientWidth<700?.32:.18, Math.min(1, sc.clientWidth/(x1-x0))));
+  sc.scrollTo({left:x0*scale - Math.max(0,(sc.clientWidth-(x1-x0)*scale)/2), top:Math.max(0,y0*scale), behavior:"smooth"});
+}
+function centerOnNathan(){
+  const sc=$("#scroller");
+  sc.scrollLeft=(X("nathan")+NW)*scale - sc.clientWidth/2;
+}
+$("#jump").innerHTML = [["Nathan","nathan","var(--accent)"],...BRANCHES.map(b=>[b.label.replace("Branche ",""),b.id,BR[b.key]])]
+  .map(([l,id,c])=>`<button class="jbtn" data-jump="${id}" style="--c:${c}"><i></i>${l}</button>`).join("");
+$("#jump").addEventListener("click",e=>{ const b=e.target.closest("[data-jump]"); if(!b) return; e.stopPropagation();
+  const id=b.dataset.jump; if(id==="nathan"){ focusOn(["denis","nadia","nathan","julie"]); return; } focusOn(subtree(id)); });
+$("#zin").onclick=()=>applyScale(scale+.15);
+$("#zfull").onclick=()=>{ const b=document.querySelector(".board"), on=!b.classList.contains("full");
+  b.classList.toggle("full",on); document.body.classList.toggle("noscroll",on); $("#zfull").textContent=on?"✕":"⤢";
+  $("#zfull").setAttribute("aria-label",on?"Quitter le plein écran":"Plein écran"); setTimeout(()=>applyScale(scale),50); };
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && document.querySelector(".board.full") && !$("#dlg").open) $("#zfull").click(); });
+(function pinch(){
+  const sc=$("#scroller"); let d0=0, s0=1;
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+  sc.addEventListener("touchstart",e=>{ if(e.touches.length===2){ d0=dist(e.touches); s0=scale; } },{passive:true});
+  sc.addEventListener("touchmove",e=>{ if(e.touches.length===2 && d0){ e.preventDefault(); applyScale(s0*dist(e.touches)/d0); } },{passive:false});
+  sc.addEventListener("touchend",e=>{ if(e.touches.length<2) d0=0; },{passive:true});
+  sc.addEventListener("wheel",e=>{ if(e.ctrlKey){ e.preventDefault(); applyScale(scale*(e.deltaY<0?1.08:0.93)); } },{passive:false});
+})();
+$("#zout").onclick=()=>applyScale(scale-.15);
+$("#zfit").onclick=()=>{applyScale(fitScale());centerOnNathan();$("#scroller").scrollTop=0;};
+(function pan(){
+  const sc=$("#scroller"); let down=null, moved=false;
+  sc.addEventListener("pointerdown",e=>{ if(e.pointerType!=="mouse"||e.button!==0) return;
+    down={x:e.clientX,y:e.clientY,l:sc.scrollLeft,t:sc.scrollTop}; moved=false; });
+  window.addEventListener("pointermove",e=>{ if(!down) return;
+    const dx=e.clientX-down.x, dy=e.clientY-down.y;
+    if(Math.abs(dx)+Math.abs(dy)>5){moved=true;sc.classList.add("drag");}
+    sc.scrollLeft=down.l-dx; sc.scrollTop=down.t-dy; });
+  window.addEventListener("pointerup",()=>{ down=null; sc.classList.remove("drag"); });
+  sc.addEventListener("click",e=>{ if(moved){e.stopPropagation();e.preventDefault();moved=false;} },true);
+})();
+
+function render(){
+  drawTree();
+  $("#kin").innerHTML=["aristide","nazarena","mariam","liliane"].map(id=>nodeHTML(id,"min-height:"+NH+"px")).join("");
+  const people=Object.values(P);
+  const proved=people.filter(p=>bestStatus(p)==="proved").length;
+  $("#stats").innerHTML=[[people.length,"personnes"],[proved,"avec un acte direct"],[ACTS.filter(a=>a.st!=="attendu").length,"actes lus et analysés"],[PENDING.length,"demandes en attente"]]
+    .map(([n,l])=>`<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
+  $("#pending").innerHTML=PENDING.map(([t,w,m])=>`<li><span>${esc(t)}</span><span class="where">${esc(w)}</span><span class="meta">${esc(m)}</span></li>`).join("");
+  $("#fixes").innerHTML=FIXES.map(([t,m])=>`<li><span>${esc(t)}</span><span></span><span class="meta">${esc(m)}</span></li>`).join("");
+  $("#updated").textContent=UPDATED;
+  const nLang = ACTS.filter(a=>a.st!=="attendu" && a.p.some(([q])=>P[q]&&P[q].br==="lang")).length;
+  $("#auditsum").innerHTML = `<span><b>${nLang}</b> actes de la branche relus et croisés le 24/10/2026</span><span><b>${CHECKS.filter(c=>c[0]==="ok").length}</b> concordances</span><span><b>${CHECKS.filter(c=>c[0]==="warn").length}</b> points de vigilance</span>`;
+  $("#auditlist").innerHTML = CHECKS.map(c=>`<li class="${c[0]}"><b>${c[0]==="ok"?"✓":"!"}</b><span>${esc(c[2])} ${c[1].map(q=>`<button class="chip" data-id="${q}">${esc(P[q].given+" "+P[q].surname)}</button>`).join(" ")}</span></li>`).join("");
+  const sc=$("#scroller");
+  if(sc.clientWidth < 700){ applyScale(.5); centerOnNathan(); sc.scrollTop = sc.scrollHeight; return; }
+  const hFit = (parseFloat(getComputedStyle(sc).height)-12)/SH;
+  applyScale(Math.max(fitScale(), Math.min(1,hFit))); centerOnNathan(); sc.scrollTop = sc.scrollHeight;
+}
+function actCard(a, self){
+  const rg = a.reg ? REGS[a.reg] : null, [cls,lab] = ST_ACT[a.st];
+  const ref = rg ? `<a href="${AD+rg[0]}" target="_blank" rel="noopener">${esc(rg[1])}</a>${a.v?`, vue ${a.v}`:""}` : (a.st==="copie"?"Copie intégrale délivrée par la mairie (non publiée)":"");
+  const role = (a.p.find(([q])=>q===self)||[])[1];
+  const others = a.p.filter(([q])=>q!==self && P[q]);
+  return `<details class="act ${a.st}"><summary><span class="pill ${cls}">${lab}</span><span class="at">${esc(a.t)} · ${esc(a.d)}</span><span class="ac">${esc(a.c)}${a.n&&a.n!=="—"?" · n° "+esc(a.n):""}</span>${role?`<span class="ar">${esc(role)}</span>`:""}</summary>
+    <div class="ab"><p>${esc(a.r)}</p>${ref?`<p class="aref">${ref}</p>`:""}
+    ${others.length?`<div class="links">${others.map(([q,r])=>`<button class="chip" data-id="${q}">${esc(P[q].given+" "+P[q].surname)} <em>${esc(r)}</em></button>`).join("")}</div>`:""}</div></details>`;
+}
+function linkChips(ids){return `<div class="links">${ids.map(i=>`<button class="chip" data-id="${i}">${esc(P[i].given+" "+P[i].surname)}</button>`).join("")}</div>`}
+function factRow(k,v,s,src){return `<div class="fact"><div class="k">${k}</div><div class="v"><span>${esc(v)}</span>${s||src?`<span class="src">${s?pill(s):""}${src?esc(src):""}</span>`:""}</div></div>`}
+function open(id){
+  const p=P[id];
+  let h=`<div class="hd"><h3>${esc(p.given)} ${esc(p.surname)}<small>${p.sosa?"Sosa "+p.sosa:esc(p.rel||"")}</small></h3><button class="close" id="x">Fermer</button></div><div class="facts">`;
+  if(p.birth) h+=factRow("Naissance",[p.birth.d,p.birth.p].filter(Boolean).join(", "),p.birth.s,p.birth.src||(p.birth.s==="family"?"Arbre ou récit familial":""));
+  if(p.death) h+=factRow("Décès",[p.death.d,p.death.p].filter(Boolean).join(", "),p.death.s,p.death.src);
+  (p.facts||[]).forEach(f=>h+=factRow(f[0],f[1],f[2],f[3]));
+  (p.variants||[]).forEach(v=>h+=factRow("Variante",v,null,null));
+  h+=`</div>`;
+  if(p.note) h+=`<div class="note">${esc(p.note)}</div>`;
+  const al = actsOf(id).sort((a,b)=>({copie:0,lu:1,attendu:2}[a.st]-{copie:0,lu:1,attendu:2}[b.st]) || (yearOf(a.d)||0)-(yearOf(b.d)||0));
+  h+=`<div><div class="eyebrow" style="margin-bottom:6px">Actes liés (${al.length})</div>`;
+  h+= al.length ? `<div class="acts">${al.map(a=>actCard(a,id)).join("")}</div>` : `<div class="note">Aucun acte encore : les informations viennent de l'arbre ou du récit familial.</div>`;
+  h+=`</div>`;
+  const ck = CHECKS.filter(c=>c[1].includes(id));
+  if(ck.length) h+=`<div><div class="eyebrow" style="margin-bottom:6px">Contrôles de cohérence</div><ul class="checks">${ck.map(c=>`<li class="${c[0]}"><b>${c[0]==="ok"?"✓":"!"}</b><span>${esc(c[2])}</span></li>`).join("")}</ul></div>`;
+  if(p.parents) h+=`<div><div class="eyebrow" style="margin-bottom:6px">Parents</div>${linkChips(p.parents)}</div>`;
+  if(p.spouse) h+=`<div><div class="eyebrow" style="margin-bottom:6px">Conjoint</div>${linkChips([p.spouse])}</div>`;
+  if(p.children) h+=`<div><div class="eyebrow" style="margin-bottom:6px">Enfants connus</div>${linkChips(p.children)}</div>`;
+  if(p.siblings) h+=`<div><div class="eyebrow" style="margin-bottom:6px">Fratrie</div>${linkChips(p.siblings)}</div>`;
+  $("#sheet").innerHTML=h;
+  const d=$("#dlg"); if(!d.open) d.showModal();
+  $("#x").onclick=()=>d.close();
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-id]"); if(b){open(b.dataset.id);return}
+  if(e.target.id==="dlg") $("#dlg").close();
+});
+render();
+let rz; window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{applyScale(fitScale());centerOnNathan();},200)});
+</script>
+
+</body>
+</html>
